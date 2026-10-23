@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+Sitemap: https://techno-software-czech.vercel.app/sitemap.xml
