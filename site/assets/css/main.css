@@ -216,6 +216,8 @@ body.menu-open { overflow: hidden; }
   display: flex; flex-direction: column; isolation: isolate; overflow: clip;
 }
 .hero__canvas { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; image-rendering: pixelated; }
+.hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 160px; z-index: -1; pointer-events: none; background: linear-gradient(var(--cobalt-700) 30%, rgba(21, 48, 214, 0)); }
+@media (max-width: 860px) { .hero::before { height: 46%; background: linear-gradient(var(--cobalt-700) 25%, rgba(21, 48, 214, .55) 60%, rgba(21, 48, 214, 0)); } }
 .hero__rules { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
 .hero__rules span { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule-on-accent); }
 .hero__rules span:nth-child(1) { left: 50%; }
