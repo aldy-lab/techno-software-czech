@@ -65,7 +65,7 @@
   --gutter: clamp(16px, 3.4vw, 48px);
   --section: clamp(80px, 9vw, 136px);
   --max: 1520px;
-  --header-h: 72px;
+  --header-h: 84px;
 
   --ease-out: cubic-bezier(.22, 1, .36, 1);
 }
@@ -139,11 +139,11 @@ button { font: inherit; color: inherit; }
 @media (hover: hover) { .link-arrow:hover svg { transform: translateX(4px); } }
 
 /* ---------- logo ---------- */
-.logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-.logo__mark { width: 30px; height: 30px; flex: none; }
+.logo { display: inline-flex; align-items: center; gap: 15px; text-decoration: none; color: inherit; }
+.logo__mark { width: 42px; height: 42px; flex: none; }
 .logo__word { display: grid; line-height: 1; }
-.logo__name { font-size: 1.02rem; font-weight: 560; letter-spacing: -.01em; }
-.logo__sub { font-family: var(--mono); font-size: .6rem; letter-spacing: .32em; margin-top: 4px; opacity: .75; }
+.logo__name { font-size: 1.38rem; font-weight: 560; letter-spacing: -.01em; }
+.logo__sub { font-family: var(--mono); font-size: .72rem; letter-spacing: .32em; margin-top: 6px; opacity: .75; }
 @property --dock-y { syntax: "<length>"; inherits: true; initial-value: 0px; }
 @media (hover: hover) { .logo:hover { --dock-y: -11.5px; } }
 
@@ -519,7 +519,11 @@ body.menu-open { overflow: hidden; }
   .hero__rules span:nth-child(2) { display: none; }
 }
 @media (max-width: 860px) {
-  :root { --header-h: 64px; }
+  :root { --header-h: 70px; }
+  .logo { gap: 12px; }
+  .logo__mark { width: 36px; height: 36px; }
+  .logo__name { font-size: 1.18rem; }
+  .logo__sub { font-size: .64rem; margin-top: 5px; }
   .hero__body { grid-template-columns: minmax(0, 1fr); padding-top: calc(var(--header-h) + 24px); }
   .hero__rules span { display: none; }
   .hero__eyebrow, .hero__title, .hero__side { grid-column: 1; }
