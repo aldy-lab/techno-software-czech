@@ -18,6 +18,14 @@ python3 tools/build.py && python3 tools/og.py
 python3 -m http.server 8123 --directory site
 ```
 
+## Easter egg
+
+**Blueprint mode** — type `blueprint` anywhere (outside form fields), or tap the outlined
+"Techno Software" wordmark in the footer five times. The site turns into an engineering
+drawing: measuring grid, crosshair with coordinates, element inspector, section dimensions and a
+drawing title block that links to /careers. Esc or the button exits. `assets/js/blueprint.js`
+loads only when triggered. The browser console hints at it for developers.
+
 ## Waiting on the client
 
 | Item | Effect until supplied |

@@ -189,6 +189,39 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
     }
   }
 
-  // for whoever opens the console
-  console.log("%c▟▀▙  Techno Software Czech\n%cLooking for your next team? You are reading the right source.", "font:600 13px monospace;color:#1530d6", "font:12px monospace;color:#4b5486");
+  /* ---------- easter egg: blueprint mode ----------
+     Type "blueprint" anywhere (not in a form field), or tap the footer
+     wordmark five times. The code loads only when someone finds it. */
+  let bpLoad;
+  const blueprint = (from) => {
+    bpLoad = bpLoad || new Promise((ok, fail) => {
+      const sc = document.createElement("script");
+      sc.src = `/assets/js/blueprint.js${V}`;
+      sc.onload = ok; sc.onerror = fail;
+      document.head.appendChild(sc);
+    });
+    bpLoad.then(() => window.TSCBlueprint.toggle(undefined, from));
+  };
+  let typed = "";
+  addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest("input, textarea, select, [contenteditable]")) return;
+    if (e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-9);
+    if (typed === "blueprint") { typed = ""; blueprint(); }
+  });
+  const word = $(".footer__word");
+  if (word) {
+    let taps = 0, timer = 0;
+    word.addEventListener("click", (e) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => (taps = 0), 1200);
+      if (++taps === 5) { taps = 0; blueprint({ x: e.clientX, y: e.clientY }); }
+    });
+  }
+
+  // for whoever opens the console — engineers are exactly who we want to meet
+  console.log(
+    "%c▟▀▙  Techno Software Czech%c\n\nReading the console? Then you are the kind of engineer we place.\n→ " + location.origin + "/careers\n\nP.S. type  blueprint  anywhere on the page.",
+    "font:600 13px monospace;color:#1530d6", "font:12px/1.5 monospace;color:#4b5486"
+  );
 })();
