@@ -5,7 +5,7 @@ and SVG sprite) and tools/content.py.
 
 SITE is the public origin; INDEXABLE flips noindex/robots once the domain is live.
 """
-import html, json, pathlib, re, sys
+import hashlib, html, json, pathlib, re, sys
 from datetime import date
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -18,6 +18,14 @@ TOOLS = pathlib.Path(__file__).resolve().parent
 ROOT = TOOLS.parent / "site"
 src = (TOOLS / "index.src.html").read_text(encoding="utf-8")
 og_jobs = []  # (key, eyebrow, title) for tools/og.py
+
+# One fingerprint for all CSS + JS: URLs change whenever any of them does, so the
+# host can cache /assets/css and /assets/js for a year (see vercel.json).
+ASSETS = sorted((ROOT / "assets" / "css").glob("*.css")) + sorted((ROOT / "assets" / "js").glob("*.js"))
+VER = hashlib.sha256(b"".join(f.read_bytes() for f in ASSETS)).hexdigest()[:10]
+
+# Prefetch same-site pages on hover/touch, so the next page is usually already here.
+SPECULATION = """<script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/assets/*"}}]},"eagerness":"moderate"}]}</script>"""
 
 
 def block(name):
@@ -53,6 +61,9 @@ def og_for(key, eyebrow, title):
 
 def finish(page):
     page = page.replace("{{SITE}}", SITE)
+    page = page.replace('href="/assets/css/main.css"', f'href="/assets/css/main.css?v={VER}"')
+    page = page.replace('src="/assets/js/main.js"', f'src="/assets/js/main.js?v={VER}"')
+    page = page.replace("</head>", SPECULATION + "\n</head>", 1)
     if INDEXABLE:
         page = page.replace('<meta name="robots" content="noindex">\n', "")
     return page
