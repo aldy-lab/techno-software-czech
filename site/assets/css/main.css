@@ -222,7 +222,7 @@ body.menu-open { overflow: hidden; }
   position: relative; min-height: max(680px, 100svh); background: var(--cobalt-700); color: var(--white);
   display: flex; flex-direction: column; isolation: isolate; overflow: clip;
 }
-.hero__canvas { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; image-rendering: pixelated; }
+.hero__canvas { position: absolute; inset: -20px; z-index: -2; width: calc(100% + 40px); height: calc(100% + 40px); max-width: none; image-rendering: pixelated; will-change: transform; }
 .hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 160px; z-index: -1; pointer-events: none; background: linear-gradient(var(--cobalt-700) 30%, rgba(21, 48, 214, 0)); }
 @media (max-width: 860px) { .hero::before { height: 46%; background: linear-gradient(var(--cobalt-700) 25%, rgba(21, 48, 214, .55) 60%, rgba(21, 48, 214, 0)); } }
 .hero__rules { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
@@ -734,9 +734,3 @@ body.menu-open { overflow: hidden; }
 .play--light { --mark-fill: var(--cobalt-700); --mark-dock: var(--cobalt-300); color: var(--accent); border-color: var(--rule); margin: 0 0 0 6px; vertical-align: middle; }
 @media (hover: hover) { .play:hover { --dock-y: -11.5px; border-style: solid; border-color: var(--cobalt-300); } }
 
-/* hero cursor read-out, next to the dithered reticle */
-.hero__coord { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; padding: 3px 7px; white-space: nowrap;
-  font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; color: var(--cobalt-200); background: rgba(5, 12, 61, .55); border: 1px solid rgba(198, 207, 255, .35);
-  opacity: 0; transition: opacity .25s var(--ease-out); }
-.hero__coord.is-on { opacity: 1; }
-@media (hover: none) { .hero__coord { display: none; } }
