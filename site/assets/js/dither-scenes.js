@@ -44,22 +44,41 @@
         const w0 = 0.1 + 0.1 * Math.min(a, 1.7);
         return { th, d, R, w0, lo: -w0 * 1.12 - 0.26, hi: w0 * 1.12 * 1.45 + 0.04 };
       },
-      f(x, y, t, a, k, c) {
-        const d = c.d[k];
-        if (d < c.lo || d > c.hi) return 0;            // far from the band: nothing to draw
+      // the cursor lens: where the pointer (or the idle "ghost" cursor) is, in scene units
+      frame(t, w, h, a, inp) {
+        if (!inp || inp.s < 0.01) return null;
+        const r = 0.21;
+        return { px: inp.x * a, py: inp.y, s: inp.s, r, r2: r * r };
+      },
+      f(x, y, t, a, k, c, L) {
+        let d = c.d[k], lens = 0, mark = 0, ph0 = 0;
+        if (L) {
+          const ex = x - L.px, ey = y - L.py, q = ex * ex + ey * ey;
+          if (q < L.r2) {
+            const fall = 1 - q / L.r2;
+            lens = fall * fall * L.s;
+            d -= lens * 0.085;                         // the band bulges toward the cursor
+            ph0 = lens * 6;                            // and its ribs ripple
+            const ax = Math.abs(ex), ay = Math.abs(ey), dist = Math.sqrt(q);
+            if (Math.abs(dist - L.r * 0.92) < 0.003) mark = 0.7 * L.s;                                   // range ring
+            if ((ax < 0.0024 && ay > 0.012 && ay < 0.036) || (ay < 0.0024 && ax > 0.012 && ax < 0.036)) mark = 0.98 * L.s; // reticle
+            if (ax < 0.0035 && ay < 0.0035) mark = L.s;
+          }
+        }
+        if (d < c.lo || d > c.hi) return mark || lens * 0.22;  // far from the band: the lens reads as glass
         const th = c.th[k];
         const w = c.w0 * (1 + 0.12 * Math.sin(th * 5 + t * 0.15));
         let out = 0;
         const v = d / w;
         if (v > -1 && v < 1) {
           const z = Math.sqrt(1 - v * v);
-          const shade = clamp(0.18 + 0.75 * z - 0.35 * v);
-          const rib = Math.cos(th * c.R * 150 + v * 1.4 - t * 0.5);
+          const shade = clamp(0.18 + 0.75 * z - 0.35 * v + lens * 0.35);
+          const rib = Math.cos(th * c.R * 150 + v * 1.4 - t * 0.5 + ph0);
           out = rib > 0 ? shade * (0.3 + 0.7 * Math.pow(rib, 0.7)) * (0.55 + 0.45 * z) : shade * 0.3 * (0.55 + 0.45 * z);
         }
         if (Math.abs(d - w * 1.45 - 0.03) < 0.004) out = Math.max(out, 0.55);   // guide wire
         if (d < -w && d > -w - 0.25) out = Math.max(out, 0.12 * (1 - (-w - d) / 0.25) * (0.5 + 0.5 * Math.cos(th * c.R * 60)));
-        return out;
+        return Math.max(out * (1 + lens * 0.5) + lens * 0.16, mark);
       },
     },
     globe: {
@@ -225,7 +244,7 @@
     const { w, h, buf, scene } = it;
     const a = w / h, inv = 1 / h, col = PAL[it.colors] || PAL[scene.colors], f = scene.f, t = it.t;
     if (scene.prep && !it.cache) it.cache = scene.prep(w, h, a);
-    const fr = scene.frame ? scene.frame(t, w, h, a) : null;
+    const fr = scene.frame ? scene.frame(t, w, h, a, it.input) : null;
     for (let j = 0, k = 0; j < h; j++) {
       const y = j * inv, bj = (j & 3) << 2;
       for (let i = 0; i < w; i++, k++) {
@@ -260,7 +279,8 @@
           if (!wants(it)) continue;
           any = true;
           if (it.drawn) it.t += dt;
-          if (it.drawn && now - it.last < 1000 / (it.scene.fps || 30)) continue;
+          const fps = it.input && it.input.live ? 40 : it.scene.fps || 30;   // follow a live cursor more closely
+          if (it.drawn && now - it.last < 1000 / fps) continue;
           it.last = now;
           render(it);
         }
@@ -279,6 +299,7 @@
       size(id, w, h) { const it = items.get(id); if (it) { resize(it, w, h); wake(); } },
       vis(id, v) { const it = items.get(id); if (it) { it.visible = v; if (v) wake(); } },
       hover(id, v) { const it = items.get(id); if (it) { it.hover = v; if (v) wake(); } },
+      input(id, x, y, s, live) { const it = items.get(id); if (it) { it.input = { x, y, s, live }; if (still) { it.drawn = false; } wake(); } },
       pause(v) { paused = v; if (!v) wake(); },
       still(v) { still = v; },
     };

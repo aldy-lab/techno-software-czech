@@ -724,3 +724,19 @@ body.menu-open { overflow: hidden; }
   .hero__side { margin-bottom: 20px; gap: 14px; }
   .hero__facts li { padding-top: 14px; padding-bottom: 16px; }
 }
+
+/* ---------- the game button (footer, 404) ---------- */
+.play { --mark-fill: var(--white); --mark-dock: var(--cobalt-500); display: inline-flex; align-items: center; gap: 12px; min-height: 44px; margin-top: 28px; padding: 0 16px 0 12px;
+  background: transparent; border: 1px dashed rgba(158, 173, 255, .45); color: var(--white); cursor: pointer;
+  font-family: var(--mono); font-size: var(--fs-mono); letter-spacing: .08em; text-transform: uppercase; transition: border-color .25s, background .25s; }
+.play svg { width: 18px; height: 18px; flex: none; }
+.play__k { color: var(--cobalt-300); }
+.play--light { --mark-fill: var(--cobalt-700); --mark-dock: var(--cobalt-300); color: var(--accent); border-color: var(--rule); margin: 0 0 0 6px; vertical-align: middle; }
+@media (hover: hover) { .play:hover { --dock-y: -11.5px; border-style: solid; border-color: var(--cobalt-300); } }
+
+/* hero cursor read-out, next to the dithered reticle */
+.hero__coord { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; padding: 3px 7px; white-space: nowrap;
+  font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; color: var(--cobalt-200); background: rgba(5, 12, 61, .55); border: 1px solid rgba(198, 207, 255, .35);
+  opacity: 0; transition: opacity .25s var(--ease-out); }
+.hero__coord.is-on { opacity: 1; }
+@media (hover: none) { .hero__coord { display: none; } }

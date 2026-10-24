@@ -161,9 +161,11 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
         cv.dataset.id = id;
       });
       const api = send
-        ? { size: (id, w, h) => send({ type: "size", id, w, h }), vis: (id, v) => send({ type: "vis", id, v }), hover: (id, v) => send({ type: "hover", id, v }), pause: (v) => send({ type: "pause", v }), still: (v) => send({ type: "still", v }) }
+        ? { size: (id, w, h) => send({ type: "size", id, w, h }), vis: (id, v) => send({ type: "vis", id, v }), hover: (id, v) => send({ type: "hover", id, v }), pause: (v) => send({ type: "pause", v }), still: (v) => send({ type: "still", v }), input: (id, x, y, s, live) => send({ type: "input", id, x, y, s, live }) }
         : eng;
       if (reduce) api.still(true);
+      const heroCv = canvases.find((cv) => cv.classList.contains("hero__canvas") && cv.dataset.dither === "hero");
+      if (heroCv && !reduce) heroLens(heroCv, +heroCv.dataset.id, api);
       const ro = new ResizeObserver((es) => es.forEach((e) => {
         const [w, h] = sizeOf(e.target, e.contentRect);
         const [ow, oh] = dims.get(e.target);
@@ -180,6 +182,49 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
         card.addEventListener("pointerleave", () => api.hover(+cv.dataset.id, false));
       });
     };
+    /* The hero lens follows the cursor; with no cursor (phones, or a still mouse)
+       a "ghost" cursor drifts on its own, and a tap moves the lens there. */
+    function heroLens(cv, id, api) {
+      const hero = cv.closest(".hero");
+      const coord = document.createElement("span");
+      coord.className = "hero__coord"; coord.setAttribute("aria-hidden", "true");
+      hero.appendChild(coord);
+      let tx = 0.62, ty = 0.4, ts = 0, x = tx, y = ty, sv = 0, last = -1e9, hold = 0, real = false, raf = 0, shown = false;
+      let sent = [0, 0, -1];
+      const at = (e) => { const r = cv.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height; };
+      hero.addEventListener("pointermove", (e) => {
+        if (e.pointerType === "touch") return;
+        at(e); ts = 1; real = true; last = performance.now();
+        coord.style.transform = `translate(${e.clientX - hero.getBoundingClientRect().left + 22}px, ${e.clientY - hero.getBoundingClientRect().top + 18}px)`;
+        coord.textContent = `X ${String(Math.round(e.clientX)).padStart(4, "0")} · Y ${String(Math.round(e.clientY + scrollY)).padStart(4, "0")}`;
+        if (!e.target.closest("a, button")) { if (!shown) { coord.classList.add("is-on"); shown = true; } }
+        else if (shown) { coord.classList.remove("is-on"); shown = false; }
+        kick();
+      }, { passive: true });
+      hero.addEventListener("pointerleave", () => { real = false; last = performance.now() - 2600; coord.classList.remove("is-on"); shown = false; });
+      hero.addEventListener("pointerdown", (e) => { if (e.pointerType !== "touch") return; at(e); ts = 1; real = false; last = hold = performance.now(); kick(); }, { passive: true });
+      let visible = true;
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) kick(); }).observe(hero);
+      let prevT = 0;
+      const tick = (now) => {
+        raf = 0;
+        if (!visible || document.hidden) return;
+        const idle = now - last > 3200 && !(hold && now - hold < 1600);
+        // a live cursor gets every frame; the drifting ghost needs ~30 updates a second
+        if (!real && now - prevT < 32) { raf = requestAnimationFrame(tick); return; }
+        prevT = now;
+        if (idle) { const T = now / 1000; tx = 0.6 + 0.26 * Math.sin(T * 0.29); ty = 0.36 + 0.2 * Math.sin(T * 0.43 + 1.2); ts = 0.62; }
+        else if (!real && !(hold && now - hold < 1600)) ts = 0;
+        const k = real ? 0.22 : 0.05;
+        x += (tx - x) * k; y += (ty - y) * k; sv += (ts - sv) * 0.07;
+        if (Math.abs(x - sent[0]) > 0.0008 || Math.abs(y - sent[1]) > 0.0008 || Math.abs(sv - sent[2]) > 0.004) { sent = [x, y, sv]; api.input(id, x, y, sv, real); }
+        raf = requestAnimationFrame(tick);
+      };
+      const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+      document.addEventListener("visibilitychange", kick);
+      kick();
+    }
+
     if (send) start(null);
     else {
       const sc = document.createElement("script");
@@ -189,39 +234,22 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
     }
   }
 
-  /* ---------- easter egg: blueprint mode ----------
-     Type "blueprint" anywhere (not in a form field), or tap the footer
-     wordmark five times. The code loads only when someone finds it. */
-  let bpLoad;
-  const blueprint = (from) => {
-    bpLoad = bpLoad || new Promise((ok, fail) => {
+  /* ---------- easter egg: "Build a team", a 30-second game ----------
+     Opened by any [data-game] button; game.js loads only on the first click. */
+  let gameLoad;
+  $$("[data-game]").forEach((btn) => btn.addEventListener("click", () => {
+    gameLoad = gameLoad || new Promise((ok, fail) => {
       const sc = document.createElement("script");
-      sc.src = `/assets/js/blueprint.js${V}`;
+      sc.src = `/assets/js/game.js${V}`;
       sc.onload = ok; sc.onerror = fail;
       document.head.appendChild(sc);
     });
-    bpLoad.then(() => window.TSCBlueprint.toggle(undefined, from));
-  };
-  let typed = "";
-  addEventListener("keydown", (e) => {
-    if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest("input, textarea, select, [contenteditable]")) return;
-    if (e.key.length !== 1) return;
-    typed = (typed + e.key.toLowerCase()).slice(-9);
-    if (typed === "blueprint") { typed = ""; blueprint(); }
-  });
-  const word = $(".footer__word");
-  if (word) {
-    let taps = 0, timer = 0;
-    word.addEventListener("click", (e) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => (taps = 0), 1200);
-      if (++taps === 5) { taps = 0; blueprint({ x: e.clientX, y: e.clientY }); }
-    });
-  }
+    gameLoad.then(() => window.TSCGame.open(btn));
+  }));
 
   // for whoever opens the console — engineers are exactly who we want to meet
   console.log(
-    "%c▟▀▙  Techno Software Czech%c\n\nReading the console? Then you are the kind of engineer we place.\n→ " + location.origin + "/careers\n\nP.S. type  blueprint  anywhere on the page.",
+    "%c▟▀▙  Techno Software Czech%c\n\nReading the console? Then you are the kind of engineer we place.\n→ " + location.origin + "/careers\n\nP.S. there is a small game in the footer.",
     "font:600 13px monospace;color:#1530d6", "font:12px/1.5 monospace;color:#4b5486"
   );
 })();

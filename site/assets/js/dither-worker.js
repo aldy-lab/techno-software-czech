@@ -10,6 +10,7 @@ self.onmessage = ({ data: m }) => {
   else if (m.type === "size") eng.size(m.id, m.w, m.h);
   else if (m.type === "vis") eng.vis(m.id, m.v);
   else if (m.type === "hover") eng.hover(m.id, m.v);
+  else if (m.type === "input") eng.input(m.id, m.x, m.y, m.s, m.live);
   else if (m.type === "pause") eng.pause(m.v);
   else if (m.type === "still") eng.still(m.v);
 };

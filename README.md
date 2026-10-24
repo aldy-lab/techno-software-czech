@@ -20,11 +20,10 @@ python3 -m http.server 8123 --directory site
 
 ## Easter egg
 
-**Blueprint mode** — type `blueprint` anywhere (outside form fields), or tap the outlined
-"Techno Software" wordmark in the footer five times. The site turns into an engineering
-drawing: measuring grid, crosshair with coordinates, element inspector, section dimensions and a
-drawing title block that links to /careers. Esc or the button exits. `assets/js/blueprint.js`
-loads only when triggered. The browser console hints at it for developers.
+**Build a team** — the small "Build a team" button in the footer (and on the 404 page) opens a
+30-second game: tap or press Space to dock each engineer module onto the tower; overhang is cut
+off, perfect docks grow the block back. Score = team size, best score kept in the browser.
+The end screen links to the contact form. `assets/js/game.js` loads only on first click.
 
 ## Waiting on the client
 

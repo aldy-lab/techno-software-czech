@@ -348,7 +348,8 @@ NOTFOUND = f"""<main id="main" class="doc"><div class="wrap">
 <p class="label label--muted" style="margin-bottom:20px">Error 404</p>
 <h1>This page is<br>not in the build.</h1>
 <div class="doc__body"><p>The address may have changed. Try the home page, our careers or our insights.</p>
-<p style="display:flex;gap:10px;flex-wrap:wrap">{btn("/", "Back to home")}{btn("/careers", "Careers", "btn btn--ghost")}</p></div>
+<p style="display:flex;gap:10px;flex-wrap:wrap">{btn("/", "Back to home")}{btn("/careers", "Careers", "btn btn--ghost")}</p>
+<p>Or, while you are here: <button class="play play--light" type="button" data-game><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#mark"/></svg><span>Build a team</span><span class="play__k">30-second game</span></button></p></div>
 </div></main>"""
 (ROOT / "404.html").write_text(page("/404", "Page not found", "Page not found.", NOTFOUND, f"{SITE}/assets/img/og.png"), encoding="utf-8")
 
