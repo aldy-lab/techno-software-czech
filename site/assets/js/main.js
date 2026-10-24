@@ -8,7 +8,10 @@ const CONFIG = {
   PHONE: "",          // e.g. "+420 123 456 789"
   LINKEDIN: "",       // company page URL
   FORM_ENDPOINT: "",  // POST endpoint (Formspree, Basin, own API). Blank + no EMAIL → form removed
+  CAREERS_EMAIL: "",  // e.g. "careers@technosoftware.cz" — falls back to EMAIL; CV upload needs FORM_ENDPOINT
 };
+// where each form's mail goes when there is no endpoint
+const FORM_MAIL = { form: () => CONFIG.EMAIL, "careers-form": () => CONFIG.CAREERS_EMAIL || CONFIG.EMAIL };
 
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
@@ -25,11 +28,10 @@ const CONFIG = {
   };
   $$("[data-cfg]").forEach((el) => {
     const key = el.dataset.cfg;
-    if (key === "form") {
-      if (!CONFIG.FORM_ENDPOINT && !CONFIG.EMAIL) {
+    if (key in FORM_MAIL) {
+      if (!CONFIG.FORM_ENDPOINT && !FORM_MAIL[key]()) {
         el.remove();
-        const map = $(".contact__map");
-        if (map) map.hidden = false;
+        $$(`[data-fallback-for="${key}"]`).forEach((f) => (f.hidden = false));
       }
       return;
     }
@@ -39,6 +41,7 @@ const CONFIG = {
     const t = $("[data-cfg-text]", el);
     if (t && v.text) t.textContent = v.text;
   });
+  if (!CONFIG.FORM_ENDPOINT) $$("[data-needs-endpoint]").forEach((el) => el.remove());
   $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 
   /* ---------- header ---------- */
@@ -88,38 +91,46 @@ const CONFIG = {
     rv.forEach((el) => io.observe(el));
   } else rv.forEach((el) => el.classList.add("in"));
 
-  /* ---------- contact form ---------- */
-  const form = $("#contact-form");
-  if (form) {
+  /* ---------- forms (contact + careers) ---------- */
+  $$("form[data-cfg]").forEach((form) => {
     const status = $(".form__status", form);
+    const to = FORM_MAIL[form.dataset.cfg]();
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (form.website.value) return;
       const bad = $$("[required]", form).find((f) => !f.value.trim() || (f.type === "email" && !/^\S+@\S+\.\S+$/.test(f.value)));
       if (bad) {
-        status.textContent = "Please fill in name, a valid email and a short message.";
+        status.textContent = "Please fill in your name, a valid email and a short message.";
         bad.focus();
         return;
       }
       const data = new FormData(form);
-      const needs = data.getAll("need").join(", ");
+      data.set("form", form.dataset.cfg);
       if (CONFIG.FORM_ENDPOINT) {
         status.textContent = "Sending…";
         try {
           const r = await fetch(CONFIG.FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } });
           if (!r.ok) throw new Error(r.status);
           form.reset();
-          status.textContent = "Thank you — we will be in touch within one business day.";
+          status.textContent = form.dataset.cfg === "form" ? "Thank you — we will be in touch within one business day." : "Thank you — your application has arrived.";
         } catch {
-          status.textContent = CONFIG.EMAIL ? `Sending failed. Please email ${CONFIG.EMAIL}.` : "Sending failed. Please try again.";
+          status.textContent = to ? `Sending failed. Please email ${to}.` : "Sending failed. Please try again.";
         }
       } else {
-        const body = `Name: ${data.get("name")}\nCompany: ${data.get("company")}\nNeed: ${needs}\n\n${data.get("message")}`;
-        location.href = `mailto:${CONFIG.EMAIL}?subject=${encodeURIComponent("Team request — " + (data.get("company") || data.get("name")))}&body=${encodeURIComponent(body)}`;
+        const lines = [];
+        for (const [k, v] of data) if (v && !["website", "form", "message"].includes(k) && typeof v === "string") lines.push(`${k}: ${v}`);
+        const subject = form.dataset.cfg === "form" ? "Team request — " + (data.get("company") || data.get("name")) : "Application — " + (data.get("role") || "talent pool") + " — " + data.get("name");
+        location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n") + "\n\n" + data.get("message"))}`;
         status.textContent = "Opening your email app…";
       }
     });
-  }
+  });
+
+  // "Apply for this profile" pre-selects the profile in the careers form
+  $$("[data-role]").forEach((a) => a.addEventListener("click", () => {
+    const sel = $("#c-role");
+    if (sel) sel.value = a.dataset.role;
+  }));
 
   /* =====================================================================
      DITHER — every image on the site is drawn here: a scalar field per
