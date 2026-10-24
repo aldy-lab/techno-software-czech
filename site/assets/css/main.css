@@ -717,3 +717,10 @@ body.menu-open { overflow: hidden; }
   .perk + .perk, .perk:nth-child(3) { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); }
   .jobs__empty { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* short laptop screens: keep the hero, facts row included, inside the first screen */
+@media (min-width: 861px) and (max-height: 840px) {
+  .hero__body { padding-top: calc(var(--header-h) + 12px); padding-bottom: 24px; }
+  .hero__side { margin-bottom: 20px; gap: 14px; }
+  .hero__facts li { padding-top: 14px; padding-bottom: 16px; }
+}
