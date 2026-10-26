@@ -85,6 +85,28 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
     );
   });
 
+  /* ---------- engagement models: tabs on phones (CSS shows the bar only there) ---------- */
+  const models = $(".models");
+  if (models) {
+    const items = $$(".model", models);
+    const bar = document.createElement("div");
+    bar.className = "models__tabs"; bar.setAttribute("role", "tablist"); bar.setAttribute("aria-label", "Engagement models");
+    items.forEach((m, i) => {
+      const id = `model-${i + 1}`;
+      m.id = id; m.setAttribute("role", "tabpanel");
+      const b = document.createElement("button");
+      b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-controls", id);
+      b.textContent = $("h3", m).textContent;
+      b.addEventListener("click", () => select(i));
+      bar.appendChild(b);
+    });
+    const select = (i) => {
+      items.forEach((m, k) => m.classList.toggle("is-active", k === i));
+      $$("button", bar).forEach((b, k) => b.setAttribute("aria-selected", String(k === i)));
+    };
+    models.before(bar); models.classList.add("is-tabbed"); select(0);
+  }
+
   /* ---------- reveal ---------- */
   const rv = $$(".rv");
   if (!reduce && "IntersectionObserver" in window) {

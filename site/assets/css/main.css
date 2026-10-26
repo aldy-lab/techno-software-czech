@@ -769,3 +769,110 @@ body.menu-open { overflow: hidden; }
   /* the outlined footer wordmark must fit a 320–360 px screen */
   .footer__word { font-size: 11.2vw; }
 }
+
+/* ======================= phones: compact layout (keep last) =======================
+   The full desktop content, packed for a phone: decorative images go, repeated
+   lists go, side-by-side where a phone has room, tabs where it does not.        */
+.models__tabs { display: none; }
+@media (max-width: 860px) {
+  :root { --section: 56px; --fs-h2: clamp(2.2rem, 9vw, 2.8rem); --fs-mega: clamp(2.6rem, 11.5vw, 3.4rem); }
+  .split__h { margin-bottom: 24px; }
+  .lead { font-size: 1.08rem; }
+
+  /* about: no globe, no repeated profile chips, one paragraph, facts 2 × 2 */
+  #about .split__left { display: none; }
+  #about .split__right { gap: 24px !important; }
+  #about .prose p + p { display: none; }
+  #about div:has(> .roles) { display: none !important; }   /* beats the inline display:grid */
+  #about .kv { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  #about .kv > div { padding: 14px 10px 14px 0; }
+  #about .kv > div:nth-child(even) { padding-left: 12px; border-left: 1px solid var(--rule); }
+  #about .kv dd { font-size: 1rem; }
+
+  /* services: the intro line is enough */
+  #services .split__left { margin-bottom: 20px; gap: 12px; }
+  #services .split__left .link-arrow { display: none; }
+  .acc__btn { padding: 15px 0; }
+  .acc__title { font-size: 1.25rem; gap: 12px; }
+
+  /* industries: two-up tiles, image + name */
+  .ind-head p { font-size: .98rem; }
+  .ind-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ind { padding: 8px 8px 14px; gap: 10px; }
+  .ind__fig { aspect-ratio: 4 / 3; }
+  .ind__fig .label { display: none; }
+  .ind__body { padding-inline: 2px; gap: 0; }
+  .ind__body h3 { font-size: 1rem; line-height: 1.2; }
+  .ind__body p, .ind__tags { display: none; }
+
+  /* why us: same table, less air */
+  #why .split__left { margin-bottom: 20px; gap: 12px; }
+  .cmp__row > :first-child { padding: 12px 0 4px; font-size: .98rem; }
+  .cmp__row > * { padding: 6px 8px 10px; }
+  .cmp-note { display: none; }
+
+  /* engagement models: tabs */
+  .models__tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--rule-on-accent); margin-bottom: 4px; }
+  .models__tabs button { all: unset; box-sizing: border-box; min-height: 48px; padding: 8px 6px; text-align: center; cursor: pointer;
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: var(--cobalt-200); line-height: 1.3; }
+  .models__tabs button + button { border-left: 1px solid var(--rule-on-accent); }
+  .models__tabs button[aria-selected="true"] { background: var(--cobalt-200); color: var(--cobalt-950); }
+  .models__tabs button:focus-visible { outline: 2px solid var(--cobalt-300); outline-offset: 2px; }
+  .models.is-tabbed { border-top: 0; }
+  .models.is-tabbed .model { display: none; border-bottom: 0; padding-top: 18px; padding-bottom: 0; }
+  .models.is-tabbed .model.is-active { display: grid; }
+  .model .model__n { display: none; }
+
+  /* process: 2 × 2, name + duration */
+  .steps { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--rule-strong); }
+  .step { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 16px 12px 18px 0; border-bottom: 1px solid var(--rule); }
+  .step:nth-child(even) { padding-left: 12px; padding-right: 0; border-left: 1px solid var(--rule); }
+  .step__h { flex-direction: column; gap: 6px; }
+  .step__h h3 { font-size: 1.2rem; }
+  .step__b { padding: 0; }
+  .step__b p { display: none; }
+
+  /* partner: one paragraph */
+  .partner__grid .prose p:nth-child(2) { display: none; }
+  .partner__stats b { font-size: 1.9rem; }
+  .partner__note { font-size: .76rem; }
+
+  /* careers teaser: text only */
+  .ct__fig { display: none; }
+  .ct__body { border-left: 1px solid var(--rule); border-top: 1px solid var(--rule); padding: 24px 20px; gap: 16px; }
+  .ct__body h2 { font-size: 2rem; }
+
+  /* insights: a list of titles */
+  .posts { grid-template-columns: minmax(0, 1fr); }
+  .post { padding: 16px 16px 18px; gap: 0; grid-template-rows: auto; }
+  .post__fig, .post p { display: none; }
+  .post__body { gap: 8px; padding: 0; }
+  .post h3 { font-size: 1.12rem; }
+
+  /* FAQ */
+  #faq .split__left { margin-bottom: 16px; gap: 10px; }
+  #faq .split__left .link-arrow { display: none; }
+  #faq .acc__title { font-size: 1.08rem; }
+
+  /* contact */
+  .contact__info { gap: 18px; margin-bottom: 28px; }
+  .contact__info address { font-size: 1.05rem; }
+  .contact__map { aspect-ratio: 5 / 2; }
+
+  /* footer: denser */
+  .footer { padding-top: 48px; }
+  .footer__top { gap: 24px; padding-bottom: 32px; }
+  .footer__claim { margin-top: 14px; }
+  .play { margin-top: 18px; }
+  .footer__col a { min-height: 32px; }
+  .footer__legal { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 16px; font-size: .76rem; }
+  .footer__word { margin-top: 28px; }
+
+  /* careers page: same idea */
+  .perk { padding: 16px 0 18px; gap: 8px; }
+  .perk h3 { font-size: 1.2rem; }
+  .role { padding: 18px 16px 20px; gap: 10px; }
+  .role p { display: none; }
+  .phero { min-height: 0; }
+  .apply__info { gap: 16px; margin-bottom: 28px; }
+}
