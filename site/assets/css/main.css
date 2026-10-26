@@ -506,7 +506,7 @@ body.menu-open { overflow: hidden; }
 .doc__body h2 { font-size: 1.35rem; font-weight: 480; color: var(--text); letter-spacing: -.01em; margin-top: 24px; }
 .doc__body ul { list-style: square; padding-left: 1.2em; display: grid; gap: 6px; }
 .doc__body a { color: var(--accent); }
-.page-solid .header { background: rgba(255,255,255,.92); color: var(--text); box-shadow: 0 1px 0 var(--rule); }
+.page-solid .header { background: rgba(255,255,255,.97); color: var(--text); box-shadow: 0 1px 0 var(--rule); }
 .page-solid .header { --mark-fill: var(--cobalt-700); --mark-dock: var(--cobalt-300); }
 .page-solid .header .btn { --btn-bg: var(--cobalt-700); --btn-fg: var(--white); }
 
@@ -734,3 +734,38 @@ body.menu-open { overflow: hidden; }
 .play--light { --mark-fill: var(--cobalt-700); --mark-dock: var(--cobalt-300); color: var(--accent); border-color: var(--rule); margin: 0 0 0 6px; vertical-align: middle; }
 @media (hover: hover) { .play:hover { --dock-y: -11.5px; border-style: solid; border-color: var(--cobalt-300); } }
 
+
+
+/* ======================= phones: final overrides (keep last) ======================= */
+@media (max-width: 860px) {
+  /* opaque header everywhere — nothing shows through it */
+  .page-solid .header, .header.is-solid { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+  /* tighter vertical rhythm: the page was ~26 screens long on an iPhone */
+  :root { --section: 64px; }
+  .split__h { margin-bottom: 32px; }
+  .sec-head, .ind-head { margin-bottom: 28px; }
+  .contact__h { margin-bottom: 36px; }
+  .split__left { margin-bottom: 32px; }
+  .about__fig { aspect-ratio: 16 / 10; }
+  .ind__fig { aspect-ratio: 2 / 1; }
+  .ind { gap: 16px; padding-bottom: 22px; }
+
+  /* partner lock-up: one centred row, not three stacked pieces */
+  .partner__lockup { grid-template-columns: auto auto auto; justify-content: center; justify-items: center; gap: 14px; padding-block: 28px; margin-bottom: 36px; }
+  .partner__lockup > :first-child { justify-self: center; }
+  .partner__lockup .logo { gap: 9px; }
+  .partner__lockup .logo__mark { width: 28px; }
+  .partner__lockup .logo__name { font-size: .98rem; }
+  .partner__lockup .logo__sub { font-size: .56rem; margin-top: 4px; }
+  .partner__lockup img { width: 104px; }
+  .partner__x { font-size: 1rem; }
+
+  /* map caption: coordinates on one line, link under it */
+  .contact__map figcaption { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .contact__map figcaption .label { white-space: nowrap; font-size: .68rem; }
+}
+@media (max-width: 420px) {
+  /* the outlined footer wordmark must fit a 320–360 px screen */
+  .footer__word { font-size: 11.2vw; }
+}

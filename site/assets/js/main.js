@@ -47,13 +47,15 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
   $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 
   /* ---------- header ---------- */
+  // Transparent only at the very top of a page with a hero; solid as soon as
+  // anything can scroll underneath it (otherwise the logo sits on top of content).
   const header = $("#header");
   const hero = $(".hero");
   if (header && hero) {
-    const io = new IntersectionObserver(([e]) => header.classList.toggle("is-solid", !e.isIntersecting), {
-      rootMargin: `-${header.offsetHeight}px 0px 0px 0px`,
-    });
-    io.observe(hero);
+    let ticking = false;
+    const solid = () => { ticking = false; header.classList.toggle("is-solid", scrollY > 8); };
+    addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(solid); } }, { passive: true });
+    solid();
   }
 
   /* ---------- mobile menu ---------- */
