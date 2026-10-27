@@ -21,7 +21,7 @@ FAQ = [
     ("How do you handle data protection and security?",
      "We process personal data under GDPR, sign your NDA and security policies, and give engineers only the access their work requires. Access is removed on the day an engagement ends."),
     ("What is your relationship with Damas Engineering?",
-     "Techno Software Czech is a partner of Damas Engineering. You contract with us in Prague; through the partnership we can search a much larger network when a role is rare or a team must grow quickly."),
+     "Techno Software Czech is a spin-off of Damas Engineering Consulting. You contract with us in Prague; through the Damas network of 500 experts in five countries we can staff rare roles and grow a team quickly."),
 ]
 
 # ------------------------------------------------------------------ insights

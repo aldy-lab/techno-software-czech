@@ -23,7 +23,7 @@ h1{{font-size:{size}px;font-weight:380;letter-spacing:-.04em;line-height:1;max-w
 <div class="row"><span class="logo"><svg class="logo__mark" viewBox="0 0 32 32"><use href="#mark"/></svg><span class="logo__word"><span class="logo__name">Techno Software</span><span class="logo__sub">CZECH</span></span></span>
 <span class="label bracket" style="color:#c6cfff">{eyebrow}</span></div>
 <h1>{title}</h1>
-<div class="row"><span class="label" style="color:#c6cfff">Technical team augmentation · Prague</span><span class="label" style="color:#c6cfff">Partner of Damas Engineering</span></div>
+<div class="row"><span class="label" style="color:#c6cfff">Technical team augmentation · Prague</span><span class="label" style="color:#c6cfff">A spin-off of Damas Engineering</span></div>
 </div></div>{sprite}<script src="/assets/js/main.js"></script></body></html>"""
 
 

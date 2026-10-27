@@ -4,7 +4,7 @@
    so nothing ships as a dead link.
    ===================================================================== */
 const CONFIG = {
-  EMAIL: "",          // e.g. "info@technosoftware.cz"  → mailto links + form fallback
+  EMAIL: "info@technosoftware.cz",   // mailto links + form fallback
   PHONE: "",          // e.g. "+420 123 456 789"
   LINKEDIN: "",       // company page URL
   FORM_ENDPOINT: "",  // POST endpoint (Formspree, Basin, own API). Blank + no EMAIL → form removed

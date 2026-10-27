@@ -137,6 +137,7 @@ def faq_items():
 
 # ------------------------------------------------------------------ home
 home = src.replace("<!-- POSTS:3 -->", post_cards(C.POSTS[:3])).replace("<!-- FAQ -->", faq_items())
+home = home.replace("{{SITE}}/assets/img/og.png", og_for("home", "Technical team augmentation · Prague", "Engineering teams, extended."))
 home = home.replace("</head>", ld({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
     {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in C.FAQ]}) + "\n</head>", 1)
 (ROOT / "index.html").write_text(finish(home), encoding="utf-8")
@@ -322,7 +323,7 @@ PRIVACY = """<main id="main" class="doc"><div class="wrap">
 <div class="doc__body">
 <p>This notice explains how Techno Software Czech s.r.o. handles personal data collected through this website, under the EU General Data Protection Regulation (GDPR) and Czech Act No. 110/2019 Coll.</p>
 <h2>Controller</h2>
-<p>Techno Software Czech s.r.o., Školská 1736/12, 110 00 Praha 1 – Nové Město, Czech Republic. IČO 29521513, registered with the Municipal Court in Prague, file C 447880.</p>
+<p>Techno Software Czech s.r.o., Školská 1736/12, 110 00 Praha 1 – Nové Město, Czech Republic. IČO 29521513, registered with the Municipal Court in Prague, file C 447880. Contact for data-protection requests: <a href="mailto:info@technosoftware.cz">info@technosoftware.cz</a>.</p>
 <h2>What we collect</h2>
 <ul>
 <li><strong>Client enquiries.</strong> Name, company, email address and the content of your message.</li>
