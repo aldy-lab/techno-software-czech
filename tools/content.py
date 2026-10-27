@@ -15,7 +15,7 @@ FAQ = [
     ("Do your engineers work remotely or on-site?",
      "Both. Engineers work remotely, hybrid or on-site — in Prague or at your premises — as agreed for each engagement."),
     ("How does billing work?",
-     "Monthly, in EUR or CZK, based on approved time sheets. One invoice covers the whole team, whatever its size."),
+     "Monthly, in EUR, USD or CZK, based on approved time sheets. One invoice covers the whole team, whatever its size."),
     ("Do you work with companies outside the Czech Republic?",
      "Yes. We work with clients across the EU and beyond, in the CET time zone, under contracts governed by Czech law unless agreed otherwise."),
     ("How do you handle data protection and security?",

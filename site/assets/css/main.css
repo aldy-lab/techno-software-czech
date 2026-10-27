@@ -325,7 +325,7 @@ body.menu-open { overflow: hidden; }
   padding: 9px 12px; border: 1px solid var(--rule); color: var(--accent); background: var(--white);
 }
 .kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
-.kv > div { padding: 20px 16px 22px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; }
+.kv > div { padding: 20px 16px 22px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; align-content: start; }
 .kv > div:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--rule); }
 .kv dt { color: var(--muted); }
 .kv dd { font-size: 1.15rem; letter-spacing: -.01em; }
