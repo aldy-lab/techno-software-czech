@@ -7,7 +7,13 @@ Run after a deploy. The key is the 32-hex file at the site root (site/<key>.txt)
 the engines fetch it to prove the request comes from the site's owner.
 Google does not take part — use Search Console for Google.
 """
-import json, pathlib, re, sys, urllib.request
+import json, pathlib, re, ssl, sys, urllib.request
+
+try:  # python.org builds on macOS ship without CA certificates
+    import certifi
+    CTX = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    CTX = ssl.create_default_context()
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent / "site"
 HOST = "technosoftware.cz"
@@ -15,5 +21,5 @@ key = next(p.stem for p in ROOT.glob("*.txt") if re.fullmatch(r"[0-9a-f]{32}", p
 urls = [f"https://{HOST}{u}" for u in sys.argv[1:]] or re.findall(r"<loc>(.*?)</loc>", (ROOT / "sitemap.xml").read_text())
 body = json.dumps({"host": HOST, "key": key, "keyLocation": f"https://{HOST}/{key}.txt", "urlList": urls}).encode()
 req = urllib.request.Request("https://api.indexnow.org/indexnow", body, {"Content-Type": "application/json; charset=utf-8"})
-with urllib.request.urlopen(req, timeout=30) as r:
+with urllib.request.urlopen(req, timeout=30, context=CTX) as r:
     print(r.status, len(urls), "urls submitted")
