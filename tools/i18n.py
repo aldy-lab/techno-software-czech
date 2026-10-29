@@ -15,8 +15,12 @@ from html.parser import HTMLParser
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 ROOT = TOOLS.parent / "site"
-PAGES = {"index.html": "cs/index.html", "careers.html": "cs/careers.html", "privacy.html": "cs/privacy.html"}
-EN_PATH = {"cs/index.html": "/", "cs/careers.html": "/careers", "cs/privacy.html": "/privacy"}
+sys.path.insert(0, str(TOOLS))
+import pages as P  # noqa: E402
+EN = ["/", "/careers", "/privacy", "/how-we-vet"] + [f"/services/{x['slug']}" for x in P.SERVICES] + [f"/industries/{x['slug']}" for x in P.INDUSTRIES]
+PAGES = {("index" if u == "/" else u.strip("/")) + ".html": "cs/" + ("index" if u == "/" else u.strip("/")) + ".html" for u in EN}
+EN_PATH = {"cs/" + ("index" if u == "/" else u.strip("/")) + ".html": u for u in EN}
+LOCAL = r"careers|privacy|how-we-vet|services/[\w-]+|industries/[\w-]+"
 
 INLINE = {"a", "b", "strong", "em", "i", "span", "br", "small", "abbr", "code", "sup", "sub", "svg", "time", "s", "u", "input", "label", "wbr"}
 VOID = {"br", "img", "input", "meta", "link", "hr", "wbr", "source", "area", "base", "col", "embed", "param", "track"}
@@ -186,22 +190,37 @@ def localise(page, en_path):
     page = page.replace('<link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>',
                         '<link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>\n<link rel="preload" href="/assets/fonts/geist-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin>', 1)
     # links to pages that exist in Czech go to the Czech page
-    page = re.sub(r'href="/(careers|privacy)?([#?][^"]*)?"', lambda m: f'href="/cs{"/" + m.group(1) if m.group(1) else ""}{m.group(2) or ""}"', page)
+    page = re.sub(r'href="/(' + LOCAL + r')?([#?][^"]*)?"', lambda m: f'href="/cs{"/" + m.group(1) if m.group(1) else ""}{m.group(2) or ""}"', page)
     page = re.sub(r'<link rel="canonical" href="https://technosoftware.cz/?([^"]*)">', lambda m: f'<link rel="canonical" href="https://technosoftware.cz/cs{"/" + m.group(1) if m.group(1) else ""}">', page)
     page = re.sub(r'<a class="lang" href="[^"]*" hreflang="cs" lang="cs"><span class="vh">[^<]*</span>CS</a>',
                   f'<a class="lang" href="{en_path}" hreflang="en" lang="en"><span class="vh">English — </span>EN</a>', page)
     return page
 
 
-def faq_ld(page, cs):
-    """Translate the strings of the FAQPage JSON-LD with the same dictionary."""
+def ld_cs(page, cs):
+    """Translate the JSON-LD the Czech pages inherit: FAQ text, breadcrumb names, service names, and URLs."""
+    def tr(t):
+        v = cs.get(key(html.escape(t, quote=True)))
+        return t if v in (None, "=") else html.unescape(TAG.sub("", v))
+
+    def url(u):
+        return re.sub(r"^https://technosoftware.cz/?(" + LOCAL + r")?(?=$|#)", lambda m: "https://technosoftware.cz/cs" + ("/" + m.group(1) if m.group(1) else ""), u)
+
     def sub(m):
         data = json.loads(m.group(1))
-        if data.get("@type") != "FAQPage":
+        t = data.get("@type")
+        if t == "FAQPage":
+            for q in data["mainEntity"]:
+                q["name"] = tr(q["name"])
+                q["acceptedAnswer"]["text"] = tr(q["acceptedAnswer"]["text"])
+        elif t == "BreadcrumbList":
+            for it in data["itemListElement"]:
+                it["name"], it["item"] = tr(it["name"]), url(it["item"])
+        elif t == "Service":
+            data["name"], data["description"], data["url"] = tr(data["name"]), tr(data["description"]), url(data["url"])
+            data["inLanguage"] = "cs"
+        else:
             return m.group(0)
-        for q in data["mainEntity"]:
-            q["name"] = html.unescape(cs[key(html.escape(q["name"], quote=True))])
-            q["acceptedAnswer"]["text"] = html.unescape(cs[key(html.escape(q["acceptedAnswer"]["text"], quote=True))])
         return f'<script type="application/ld+json">{json.dumps(data, ensure_ascii=False)}</script>'
     return re.sub(r'<script type="application/ld\+json">(.*?)</script>', sub, page, flags=re.S)
 
@@ -219,8 +238,8 @@ def main():
     if missing:
         sys.exit(f"{len(missing)} strings untranslated — run with --todo")
     for out, page in built.items():
-        page = faq_ld(localise(page, EN_PATH[out]), cs)
-        (ROOT / out).parent.mkdir(exist_ok=True)
+        page = ld_cs(localise(page, EN_PATH[out]), cs)
+        (ROOT / out).parent.mkdir(parents=True, exist_ok=True)
         (ROOT / out).write_text(page, encoding="utf-8")
     print("cs:", ", ".join(PAGES.values()))
 

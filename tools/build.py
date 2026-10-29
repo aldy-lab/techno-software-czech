@@ -10,9 +10,13 @@ from datetime import date
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import content as C  # noqa: E402
+import pages as P  # noqa: E402
 
 SITE = "https://technosoftware.cz"
 INDEXABLE = True   # technosoftware.cz connected 29 Oct 2026
+# Plausible Analytics: "" = off (no script, privacy notice says "no analytics"). Set to the
+# domain registered in Plausible, e.g. "technosoftware.cz", to switch counting on site-wide.
+ANALYTICS = ""
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 ROOT = TOOLS.parent / "site"
@@ -72,6 +76,8 @@ def finish(page, path="/"):
     page = page.replace('href="/assets/css/main.css"', f'href="/assets/css/main.css?v={VER}"')
     page = page.replace('src="/assets/js/main.js"', f'src="/assets/js/main.js?v={VER}"')
     page = page.replace("</head>", SPECULATION + "\n</head>", 1)
+    if ANALYTICS:
+        page = page.replace("</head>", f'<script defer data-domain="{ANALYTICS}" src="https://plausible.io/js/script.js"></script>\n</head>', 1)
     if INDEXABLE:
         page = page.replace('<meta name="robots" content="noindex">\n', "")
     return page
@@ -200,6 +206,66 @@ for p in C.POSTS:
         f"/insights/{p['slug']}", p["title"], p["desc"], body, og_for(p["slug"], p["tag"], p["title"]),
         article + "\n" + crumbs_ld([("Home", "/"), ("Insights", "/insights"), (p["title"], f"/insights/{p['slug']}")])), encoding="utf-8")
 
+# ------------------------------------------------------------------ services, industries, vetting
+SVC = {s["slug"]: s for s in P.SERVICES}
+IND = {i["slug"]: i for i in P.INDUSTRIES}
+EXTRA = [f"/services/{s['slug']}" for s in P.SERVICES] + [f"/industries/{i['slug']}" for i in P.INDUSTRIES] + ["/how-we-vet"]
+CS_PAGES.update({p: "/cs" + p for p in EXTRA})
+
+
+def toc_of(body):
+    return "".join(f'<li><a href="#{i}">{t}</a></li>' for i, t in re.findall(r'<h2 id="([\w-]+)">(.*?)</h2>', body))
+
+
+def rel_cards(items, base, kind):
+    cards = "".join(f"""
+      <a class="post rv" href="/{base}/{x['slug']}">
+        <div class="post__fig"><canvas data-dither="{x['scene']}" data-colors="light" aria-hidden="true"></canvas></div>
+        <div class="post__body">
+          <div class="post__meta label"><span>{kind}</span><span>{x['n']}</span></div>
+          <h3>{esc(x['name'])}</h3>
+          <p>{esc(x['lead'])}</p>
+        </div>
+      </a>""" for x in items)
+    return f'<div class="posts">{cards}\n    </div>'
+
+
+def detail(path, crumb_label, crumb_href, x, rel_title, rel_html, og_key, eyebrow, extra_ld):
+    meta = '<div class="art-meta label">' + "".join(f"<span>{esc(t)}</span>" for t in x.get("tags", [])) + "</div>" if x.get("tags") else ""
+    crumbs = f'<a href="/">Home</a>{SEP}' + (f'<a href="{crumb_href}">{crumb_label}</a>{SEP}' if crumb_label else "") + f'<span>{esc(x.get("name", x["title"]))}</span>'
+    body = text_hero(crumbs, esc(x["title"]), esc(x["lead"]), meta) + f"""
+<div class="wrap"><figure class="art-fig"><canvas data-dither="{x.get('scene', 'hero')}" data-colors="light" aria-hidden="true"></canvas></figure></div>
+<div class="wrap art">
+  <aside class="art__aside"><span class="label">On this page</span><ol>{toc_of(x['body'])}</ol>{btn("/#contact", "Request engineers")}</aside>
+  <article class="art__body">{x['body']}</article>
+</div>
+{f'<section class="section section--alt"><div class="wrap"><div class="sec-head"><h2>{rel_title}</h2></div>{rel_html}</div></section>' if rel_html else ''}
+{CTA}
+</main>"""
+    trail = [("Home", "/")] + ([(crumb_label, crumb_href)] if crumb_label else []) + [(x.get("name", x["title"]), path)]
+    return page(path, x["title"], x["desc"], body, og_for(og_key, eyebrow, x.get("name", x["title"])), extra_ld + "\n" + crumbs_ld(trail))
+
+
+def service_ld(x, path):
+    return ld({"@context": "https://schema.org", "@type": "Service", "name": x["name"], "description": x["desc"], "url": SITE + path,
+               "areaServed": "Europe", "provider": {"@type": "Organization", "name": "Techno Software Czech s.r.o.", "url": SITE + "/"}})
+
+
+for d in ("services", "industries"):
+    (ROOT / d).mkdir(exist_ok=True)
+for s in P.SERVICES:
+    path = f"/services/{s['slug']}"
+    (ROOT / "services" / f"{s['slug']}.html").write_text(detail(
+        path, "Services", "/#services", s, "Industries", rel_cards([IND[k] for k in s["industries"]], "industries", "Industry"),
+        f"svc-{s['slug']}", "Services", service_ld(s, path)), encoding="utf-8")
+for i in P.INDUSTRIES:
+    path = f"/industries/{i['slug']}"
+    (ROOT / "industries" / f"{i['slug']}.html").write_text(detail(
+        path, "Industries", "/#industries", i, "Services", rel_cards([SVC[k] for k in i["services"]], "services", "Service"),
+        f"ind-{i['slug']}", "Industries", service_ld({**i, "name": i["title"]}, path)), encoding="utf-8")
+(ROOT / "how-we-vet.html").write_text(detail(
+    "/how-we-vet", "", "", {**P.VETTING, "scene": "map"}, "", "", "how-we-vet", "Process", ""), encoding="utf-8")
+
 # ------------------------------------------------------------------ careers
 role_opts = "".join(f'<option value="{esc(r[0])}">{esc(r[0])}</option>' for r in C.ROLES) + "".join(f'<option value="{esc(j["title"])}">{esc(j["title"])}</option>' for j in C.JOBS)
 roles = "".join(f"""
@@ -287,7 +353,7 @@ careers_body = f"""<main id="main">
           <label><input type="checkbox" name="contract" value="Contractor"><span>Contractor (IČO)</span></label>
         </div>
       </fieldset>
-      <div class="field" data-needs-endpoint><label class="label" for="c-cv">CV (PDF or Word, max 10 MB)</label><input id="c-cv" name="cv" type="file" accept=".pdf,.doc,.docx"></div>
+      <div class="field" data-needs-endpoint hidden><label class="label" for="c-cv">CV (PDF or Word, max 4 MB)</label><input id="c-cv" name="cv" type="file" accept=".pdf,.doc,.docx"></div>
       <div class="field"><label class="label" for="c-msg">About you</label><textarea id="c-msg" name="message" rows="4" required></textarea></div>
       <label class="consent"><input type="checkbox" name="talent_pool" value="yes"><span>Keep my details in the talent pool for up to 2 years so you can contact me about future projects. I can withdraw this at any time.</span></label>
       <div class="hp" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
@@ -325,7 +391,9 @@ for j in C.JOBS:
                                                              ld(posting) + "\n" + crumbs_ld([("Home", "/"), ("Careers", "/careers"), (j["title"], f"/careers/{j['slug']}")])), encoding="utf-8")
 
 # ------------------------------------------------------------------ privacy + 404
-PRIVACY = """<main id="main" class="doc"><div class="wrap">
+PRIVACY_ANALYTICS = ("<p>This website sets no cookies and loads no third-party trackers, fonts or embeds. We count visits with Plausible Analytics, a cookieless service hosted in the EU that stores no personal data and no IP addresses; it shows us only totals such as page views, referring sites and countries.</p>"
+                     if ANALYTICS else "<p>This website sets no cookies, runs no analytics and loads no third-party trackers, fonts or embeds.</p>")
+PRIVACY = f"""<main id="main" class="doc"><div class="wrap">
 <p class="label label--muted" style="margin-bottom:20px">Last updated 24 October 2026</p>
 <h1>Privacy notice</h1>
 <div class="doc__body">
@@ -338,7 +406,8 @@ PRIVACY = """<main id="main" class="doc"><div class="wrap">
 <li><strong>Job applications.</strong> Name, email, the profile you apply for, your CV or profile link, your preferred working arrangement and what you tell us about yourself.</li>
 <li><strong>Server logs.</strong> Our hosting provider records technical data such as IP address and browser type for security and operation, kept for a short period.</li>
 </ul>
-<p>This website sets no cookies, runs no analytics and loads no third-party trackers, fonts or embeds.</p>
+{PRIVACY_ANALYTICS}
+<p data-processor-line hidden>When you send a form, its contents are passed to our email delivery provider, <span data-processor></span>, which delivers them to our inbox and keeps them only as long as delivery requires.</p>
 <h2>Why, and on what basis</h2>
 <p>We use enquiry data to answer you and prepare an offer (Art. 6(1)(b) GDPR, steps prior to a contract) and server logs to keep the site secure (Art. 6(1)(f), legitimate interest).</p>
 <h2 id="candidates">Candidates</h2>
@@ -347,7 +416,7 @@ PRIVACY = """<main id="main" class="doc"><div class="wrap">
 <h2>How long</h2>
 <p>Enquiries that do not lead to cooperation are deleted within 12 months. Data relating to a contract is kept for as long as tax and accounting law requires.</p>
 <h2>Who processes it</h2>
-<p>The site is hosted by Vercel Inc. Data shared with our partner Damas Engineering is limited to what is needed to staff a request, and candidate data only with the candidate's agreement.</p>
+<p>The site is hosted by Vercel Inc.; messages you send through its forms are processed in Vercel's Frankfurt region (EU). Data shared with our partner Damas Engineering is limited to what is needed to staff a request, and candidate data only with the candidate's agreement.</p>
 <h2>Your rights</h2>
 <p>You may request access, correction, deletion, restriction or portability of your data, object to processing and withdraw consent. You may also complain to the Czech Office for Personal Data Protection (<a href="https://uoou.gov.cz" rel="noopener">uoou.gov.cz</a>).</p>
 </div></div></main>"""
@@ -363,7 +432,7 @@ NOTFOUND = f"""<main id="main" class="doc"><div class="wrap">
 (ROOT / "404.html").write_text(page("/404", "Page not found", "Page not found.", NOTFOUND, f"{SITE}/assets/img/og.png"), encoding="utf-8")
 
 # ------------------------------------------------------------------ sitemap, robots, og list
-urls = ["/", "/careers", "/insights"] + [f"/insights/{p['slug']}" for p in C.POSTS] + [f"/careers/{j['slug']}" for j in C.JOBS] + ["/privacy"] + list(CS_PAGES.values())
+urls = ["/", "/careers", "/insights"] + EXTRA + [f"/insights/{p['slug']}" for p in C.POSTS] + [f"/careers/{j['slug']}" for j in C.JOBS] + ["/privacy"] + list(CS_PAGES.values())
 (ROOT / "sitemap.xml").write_text(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + "".join(f"  <url><loc>{SITE}{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")

@@ -14,7 +14,7 @@ sprite = re.search(r"<!-- CHROME:SPRITE -->.*?<!-- /CHROME:SPRITE -->", (SITE / 
 
 CARD = """<!doctype html><html class="js"><head><meta charset="utf-8"><link rel="stylesheet" href="/assets/css/main.css">
 <style>body{{margin:0;width:1200px;height:630px;overflow:hidden}} .c{{position:relative;width:1200px;height:630px;background:#1530d6;color:#fff;isolation:isolate}}
-.c canvas{{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:-1}}
+.c canvas{{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:-2}}
 .c::before{{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#1530d6 45%,rgba(21,48,214,.2))}}
 .in{{position:absolute;inset:56px 64px;display:flex;flex-direction:column;justify-content:space-between}}
 h1{{font-size:{size}px;font-weight:380;letter-spacing:-.04em;line-height:1;max-width:15ch}}

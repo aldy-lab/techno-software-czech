@@ -485,7 +485,7 @@ body.menu-open { overflow: hidden; }
 
 /* ---------- footer ---------- */
 .footer { background: var(--cobalt-950); color: var(--white); padding-top: clamp(64px, 8vw, 112px); padding-bottom: 28px; position: relative; overflow: clip; }
-.footer__top { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 32px; padding-bottom: clamp(48px, 6vw, 88px); }
+.footer__top { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); gap: 32px; padding-bottom: clamp(48px, 6vw, 88px); }
 .footer__top { --mark-dock: var(--cobalt-500); }
 .footer__claim { margin-top: 24px; max-width: 30ch; color: rgba(255,255,255,.66); }
 .footer__col { display: grid; gap: 4px; align-content: start; }
@@ -949,3 +949,9 @@ body.menu-open { overflow: hidden; }
 }
 
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* the details link sits on the card's bottom edge, whatever the text above it */
+.ind__body { grid-template-rows: auto auto auto 1fr; }
+.ind__body > .link-arrow { align-self: end; margin-top: 8px; }
+.acc__content > .link-arrow { grid-column: 2; margin-top: 6px; }
+/* the hidden attribute always wins over a component's own display */
+[hidden] { display: none !important; }

@@ -7,8 +7,8 @@ const CONFIG = {
   EMAIL: "info@technosoftware.cz",   // mailto links + form fallback
   PHONE: "",          // e.g. "+420 123 456 789"
   LINKEDIN: "",       // company page URL
-  FORM_ENDPOINT: "",  // POST endpoint (Formspree, Basin, own API). Blank + no EMAIL → form removed
-  CAREERS_EMAIL: "",  // e.g. "careers@technosoftware.cz" — falls back to EMAIL; CV upload needs FORM_ENDPOINT
+  FORM_ENDPOINT: "/api/form",  // site/api/form.js; sends only once MAIL_* are set in Vercel, else the email app opens
+  CAREERS_EMAIL: "",  // e.g. "careers@technosoftware.cz" — falls back to EMAIL; CV upload needs a configured endpoint
 };
 // where each form's mail goes when there is no endpoint
 const FORM_MAIL = { form: () => CONFIG.EMAIL, "careers-form": () => CONFIG.CAREERS_EMAIL || CONFIG.EMAIL };
@@ -56,7 +56,21 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
     const t = $("[data-cfg-text]", el);
     if (t && v.text) t.textContent = v.text;
   });
-  if (!CONFIG.FORM_ENDPOINT) $$("[data-needs-endpoint]").forEach((el) => el.remove());
+  // Does the endpoint actually deliver? Until it says so, forms use the email app and
+  // the CV upload (which an email link cannot carry) stays hidden.
+  let endpointLive = false;
+  const processor = CONFIG.FORM_ENDPOINT
+    ? fetch(CONFIG.FORM_ENDPOINT, { headers: { Accept: "application/json" } }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}))
+    : Promise.resolve({});
+  processor.then((p) => {
+    endpointLive = !!p.configured;
+    $$("[data-needs-endpoint]").forEach((el) => (el.hidden = !endpointLive));
+    // the privacy notice names the mail processor only while one is in use
+    $$("[data-processor-line]").forEach((el) => {
+      el.hidden = !endpointLive;
+      $$("[data-processor]", el).forEach((n) => (n.textContent = p.processor || ""));
+    });
+  });
   $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 
   /* ---------- header ---------- */
@@ -157,22 +171,31 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
       }
       const data = new FormData(form);
       data.set("form", form.dataset.cfg);
-      if (CONFIG.FORM_ENDPOINT) {
+      data.set("page", location.href);
+      const viaMail = () => {
+        const lines = [];
+        for (const [k, v] of data) if (v && !["website", "form", "message", "page"].includes(k) && typeof v === "string") lines.push(`${k}: ${v}`);
+        const subject = form.dataset.cfg === "form" ? T.request + " — " + (data.get("company") || data.get("name")) : T.application + " — " + (data.get("role") || T.pool) + " — " + data.get("name");
+        if (!to) { status.textContent = T.fail; return; }
+        location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n") + "\n\n" + data.get("message"))}`;
+        status.textContent = T.opening;
+      };
+      const sent = () => window.plausible && window.plausible(form.dataset.cfg === "form" ? "Enquiry" : "Application");
+      if (endpointLive) {
         status.textContent = T.sending;
         try {
           const r = await fetch(CONFIG.FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } });
           if (!r.ok) throw new Error(r.status);
           form.reset();
           status.textContent = form.dataset.cfg === "form" ? T.thanks : T.thanksApp;
+          sent();
         } catch {
-          status.textContent = to ? T.failTo(to) : T.fail;
+          // never lose what they typed: hand it to the email app instead
+          viaMail();
         }
       } else {
-        const lines = [];
-        for (const [k, v] of data) if (v && !["website", "form", "message"].includes(k) && typeof v === "string") lines.push(`${k}: ${v}`);
-        const subject = form.dataset.cfg === "form" ? T.request + " — " + (data.get("company") || data.get("name")) : T.application + " — " + (data.get("role") || T.pool) + " — " + data.get("name");
-        location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n") + "\n\n" + data.get("message"))}`;
-        status.textContent = T.opening;
+        viaMail();
+        sent();
       }
     });
   });

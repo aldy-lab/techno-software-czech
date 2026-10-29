@@ -25,6 +25,71 @@
   "DORA and external engineers: what fintech teams need in place"
  ],
  [
+  "svc-team-augmentation",
+  "Services",
+  "Team augmentation"
+ ],
+ [
+  "svc-dedicated-teams",
+  "Services",
+  "Dedicated teams"
+ ],
+ [
+  "svc-web-mobile-development",
+  "Services",
+  "Web & mobile development"
+ ],
+ [
+  "svc-embedded-automotive-software",
+  "Services",
+  "Embedded & automotive software"
+ ],
+ [
+  "svc-qa-test-automation",
+  "Services",
+  "QA & test automation"
+ ],
+ [
+  "svc-devops-cloud-data",
+  "Services",
+  "DevOps, cloud & data"
+ ],
+ [
+  "ind-fintech",
+  "Industries",
+  "Fintech & banking"
+ ],
+ [
+  "ind-automotive",
+  "Industries",
+  "Automotive & mobility"
+ ],
+ [
+  "ind-manufacturing",
+  "Industries",
+  "Manufacturing & Industry 4.0"
+ ],
+ [
+  "ind-healthcare",
+  "Industries",
+  "Healthcare & life sciences"
+ ],
+ [
+  "ind-energy",
+  "Industries",
+  "Energy & utilities"
+ ],
+ [
+  "ind-telecom-cybersecurity",
+  "Industries",
+  "Telecom & cybersecurity"
+ ],
+ [
+  "how-we-vet",
+  "Process",
+  "How we vet engineers"
+ ],
+ [
   "careers",
   "Careers",
   "Do your best work inside great teams."
