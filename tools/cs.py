@@ -776,3 +776,24 @@ CS.update({
 "Every engineer signs confidentiality before seeing your code, works only with the access their task needs, and is removed from your systems on the day the engagement ends.":
     "Každý inženýr podepíše mlčenlivost dřív, než uvidí váš kód, pracuje jen s přístupy, které úkol vyžaduje, a v den skončení spolupráce ho z vašich systémů odebereme.",
 })
+
+# ---------------------------------------------------------------- detail heroes, stats, vetting timeline
+CS.update({f"Fig. {n:02d} / {en}": f"Obr. {n:02d} / {cs}" for n in range(1, 7) for en, cs in (("Services", "Služby"), ("Industries", "Obory"), ("Process", "Proces"))})
+CS.update({
+"60 – 90 min": "=", "1 week": "1 týden", "To a shortlist": "Do shortlistu", "6 steps": "6 kroků", "From brief to follow-up": "Od zadání po další péči",
+"Role profile": "Profil role", "Screening": "Předvýběr", "Days 1 – 5": "Dny 1 – 5", "References": "Reference",
+"Before the shortlist": "Před shortlistem", "Your interview": "Váš pohovor", "Check-ins": "Pravidelné schůzky",
+"To the first sprint": "Do prvního sprintu", "Monthly": "Měsíčně", "Add or release people": "Přidávejte a uvolňujte lidi",
+"People per team": "Lidí v týmu", "Accountable lead": "Odpovědný vedoucí", "Scale up or down": "Zvětšení i zmenšení",
+"Web": "=", "Classic and adaptive": "Classic i adaptive", "Functional safety": "Funkční bezpečnost", "HIL / SIL": "=", "Test benches": "Testovací stanoviště",
+"Every merge": "Každý merge", "Quality measured in CI": "Kvalita měřená v CI", "API · load": "API · zátěž", "Beyond the UI": "Nejen UI",
+"Traceable": "Sledovatelné", "Evidence for audits": "Důkazy pro audit",
+"IaC": "=", "Terraform · GitOps": "=", "3 clouds": "3 cloudy", "Same day": "Týž den", "Access removed at the end": "Zrušení přístupů po skončení",
+"Open banking": "=", "ICT third-party rules": "Pravidla pro ICT dodavatele", "Audit": "=", "Evidence by default": "Důkazy jako standard",
+"ASPICE": "=", "Process experience": "Zkušenost s procesy", "Close to the plants": "Blízko závodů",
+"Machine connectivity": "Připojení strojů", "MES · ERP": "=", "Integrations": "Integrace", "At the line when needed": "U linky, když je potřeba",
+"HL7 · FHIR": "=", "Interoperability": "Interoperabilita", "Special-category data": "Zvláštní kategorie údajů", "Documentation ready": "Připravená dokumentace",
+"Metering": "Měření", "Meter-data platforms": "Platformy pro data z měřidel", "OT integrations": "Integrace OT", "Critical": "Kritická",
+"Infrastructure security": "Bezpečnost infrastruktury",
+"Identity and access": "Identity a přístupy", "Network software": "Síťový software", "Least privilege": "Minimální oprávnění", "By default": "Ve výchozím stavu",
+})

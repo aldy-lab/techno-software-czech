@@ -5,7 +5,7 @@ has not confirmed them yet (see README, "Waiting on the client")."""
 
 SERVICES = [
     {
-        "slug": "team-augmentation", "scene": "globe", "n": "01",
+        "slug": "team-augmentation", "stats": [('1 week', 'To a shortlist'), ('2 – 4 weeks', 'To the first sprint'), ('Monthly', 'Add or release people')], "scene": "augment", "n": "01",
         "name": "Team augmentation",
         "title": "Team augmentation: senior engineers inside your team",
         "desc": "Senior software, embedded, QA and DevOps engineers who join your existing team in weeks. Prague-based team augmentation, monthly flexibility, replacement guarantee.",
@@ -36,7 +36,7 @@ SERVICES = [
 """,
     },
     {
-        "slug": "dedicated-teams", "scene": "map", "n": "02",
+        "slug": "dedicated-teams", "stats": [('4 – 20', 'People per team'), ('1', 'Accountable lead'), ('Monthly', 'Scale up or down')], "scene": "team", "n": "02",
         "name": "Dedicated teams",
         "title": "Dedicated development teams, assembled around your product",
         "desc": "A complete cross-functional team — engineers, QA, tech lead and delivery manager — working only on your product. Built in Prague with the Damas Engineering network.",
@@ -65,7 +65,7 @@ SERVICES = [
 """,
     },
     {
-        "slug": "web-mobile-development", "scene": "waves", "n": "03",
+        "slug": "web-mobile-development", "stats": [('Web', 'React · Angular'), ('Mobile', 'Kotlin · Swift · Flutter'), ('Back-end', 'Java · .NET · Node')], "scene": "web", "n": "03",
         "name": "Web & mobile development",
         "title": "Web and mobile development engineers",
         "desc": "Front-end, back-end and mobile engineers for customer portals, internal platforms and native or cross-platform apps — React, Angular, Kotlin, Swift, Flutter, Java, .NET, Node.",
@@ -87,7 +87,7 @@ SERVICES = [
 """,
     },
     {
-        "slug": "embedded-automotive-software", "scene": "automotive", "n": "04",
+        "slug": "embedded-automotive-software", "stats": [('AUTOSAR', 'Classic and adaptive'), ('ISO 26262', 'Functional safety'), ('HIL / SIL', 'Test benches')], "scene": "embedded", "n": "04",
         "name": "Embedded & automotive software",
         "title": "Embedded and automotive software engineers",
         "desc": "Embedded C/C++, AUTOSAR, diagnostics and HIL/SIL test engineers for OEMs and Tier-1 suppliers — people who know ISO 26262, ASPICE and automotive toolchains.",
@@ -109,7 +109,7 @@ SERVICES = [
 """,
     },
     {
-        "slug": "qa-test-automation", "scene": "telecom", "n": "05",
+        "slug": "qa-test-automation", "stats": [('Every merge', 'Quality measured in CI'), ('API · load', 'Beyond the UI'), ('Traceable', 'Evidence for audits')], "scene": "qa", "n": "05",
         "name": "QA & test automation",
         "title": "QA and test automation engineers",
         "desc": "Manual and automated testing that fits your release rhythm: test strategy, Playwright and Selenium suites, API and load testing, quality gates in CI.",
@@ -130,7 +130,7 @@ SERVICES = [
 """,
     },
     {
-        "slug": "devops-cloud-data", "scene": "energy", "n": "06",
+        "slug": "devops-cloud-data", "stats": [('IaC', 'Terraform · GitOps'), ('3 clouds', 'AWS · Azure · GCP'), ('Same day', 'Access removed at the end')], "scene": "devops", "n": "06",
         "name": "DevOps, cloud & data",
         "title": "DevOps, cloud and data engineers",
         "desc": "DevOps, SRE, platform and data engineers: Kubernetes, Terraform, AWS, Azure and GCP, observability, cost control, Kafka and Spark pipelines.",
@@ -155,7 +155,7 @@ SERVICES = [
 
 INDUSTRIES = [
     {
-        "slug": "fintech", "scene": "fintech", "n": "01",
+        "slug": "fintech", "stats": [('PSD2', 'Open banking'), ('DORA', 'ICT third-party rules'), ('Audit', 'Evidence by default')], "scene": "fintech", "n": "01",
         "name": "Fintech & banking",
         "title": "Engineers for fintech and banking",
         "desc": "Software, QA and DevOps engineers for payment platforms, core-banking integrations and trading systems — people who know PSD2, DORA and audit-grade delivery.",
@@ -178,7 +178,7 @@ INDUSTRIES = [
 """,
     },
     {
-        "slug": "automotive", "scene": "automotive", "n": "02",
+        "slug": "automotive", "stats": [('ASPICE', 'Process experience'), ('ISO 26262', 'Functional safety'), ('CET', 'Close to the plants')], "scene": "automotive", "n": "02",
         "name": "Automotive & mobility",
         "title": "Engineers for automotive and mobility",
         "desc": "Embedded, AUTOSAR, ADAS, infotainment and test engineers for OEMs and Tier-1 suppliers — from ECU code to the cloud behind the fleet.",
@@ -201,7 +201,7 @@ INDUSTRIES = [
 """,
     },
     {
-        "slug": "manufacturing", "scene": "manufacturing", "n": "03",
+        "slug": "manufacturing", "stats": [('OPC UA', 'Machine connectivity'), ('MES · ERP', 'Integrations'), ('On-site', 'At the line when needed')], "scene": "manufacturing", "n": "03",
         "name": "Manufacturing & Industry 4.0",
         "title": "Engineers for manufacturing and Industry 4.0",
         "desc": "Software engineers for MES integrations, IoT telemetry, OPC UA and the internal tools that keep production lines measured and moving.",
@@ -223,7 +223,7 @@ INDUSTRIES = [
 """,
     },
     {
-        "slug": "healthcare", "scene": "health", "n": "04",
+        "slug": "healthcare", "stats": [('HL7 · FHIR', 'Interoperability'), ('GDPR', 'Special-category data'), ('Validation', 'Documentation ready')], "scene": "health", "n": "04",
         "name": "Healthcare & life sciences",
         "title": "Engineers for healthcare and life sciences",
         "desc": "Software and QA engineers for clinical and laboratory software — HL7 and FHIR integrations, privacy by design, validation-ready documentation.",
@@ -245,7 +245,7 @@ INDUSTRIES = [
 """,
     },
     {
-        "slug": "energy", "scene": "energy", "n": "05",
+        "slug": "energy", "stats": [('Metering', 'Meter-data platforms'), ('SCADA', 'OT integrations'), ('Critical', 'Infrastructure security')], "scene": "energy", "n": "05",
         "name": "Energy & utilities",
         "title": "Engineers for energy and utilities",
         "desc": "Software, data and DevOps engineers for smart metering, grid analytics, SCADA integrations and customer platforms in energy and utilities.",
@@ -267,7 +267,7 @@ INDUSTRIES = [
 """,
     },
     {
-        "slug": "telecom-cybersecurity", "scene": "telecom", "n": "06",
+        "slug": "telecom-cybersecurity", "stats": [('IAM', 'Identity and access'), ('5G', 'Network software'), ('Least privilege', 'By default')], "scene": "telecom", "n": "06",
         "name": "Telecom & cybersecurity",
         "title": "Engineers for telecom and cybersecurity",
         "desc": "Network software, identity and access management and security engineers for telecom operators and security-critical products.",
@@ -291,7 +291,11 @@ INDUSTRIES = [
 ]
 
 VETTING = {
-    "title": "How we vet engineers",
+    "title": "How we vet engineers", "scene": "vet",
+    "stats": [("60 – 90 min", "Technical interview"), ("1 week", "To a shortlist"), ("6 steps", "From brief to follow-up")],
+    # the timeline drawn above the text: (step, when)
+    "steps": [("Role profile", "Day 1"), ("Screening", "Days 1 – 5"), ("Technical interview", "60 – 90 min"),
+              ("References", "Before the shortlist"), ("Your interview", "Within a week"), ("Check-ins", "Ongoing")],
     "desc": "How Techno Software Czech selects engineers before you see a CV: a role profile, a technical interview with an engineer in the same stack, reference checks and regular check-ins after the start.",
     "lead": "Every engineer we propose has been interviewed by an engineer who works in the same stack. Here is the whole process, from your brief to the months after the start.",
     "body": """

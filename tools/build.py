@@ -230,11 +230,31 @@ def rel_cards(items, base, kind):
     return f'<div class="posts">{cards}\n    </div>'
 
 
+def detail_hero(crumbs, x, fig):
+    """Blue band: crumbs, title and lead beside the page's own drawing, a stats strip along the bottom."""
+    stats = "".join(f'<li><b>{esc(v)}</b><span class="label">{esc(l)}</span></li>' for v, l in x.get("stats", []))
+    return f"""<header class="dhero"><div class="wrap dhero__in">
+  <div class="dhero__text">
+    <nav class="crumbs label" aria-label="Breadcrumb">{crumbs}</nav>
+    <h1>{esc(x["title"])}</h1>
+    <p class="lead">{esc(x["lead"])}</p>
+  </div>
+  <figure class="dhero__fig" aria-hidden="true"><canvas data-dither="{x['scene']}" data-colors="onblue"></canvas><figcaption class="label">{fig}</figcaption></figure>
+</div>
+{f'<div class="wrap"><ul class="dhero__stats">{stats}</ul></div>' if stats else ''}
+</header>"""
+
+
+def flow(steps):
+    """The vetting timeline: numbered stations on one line, each with when it happens."""
+    items = "".join(f'<li><b>{i + 1:02d}</b><span>{esc(t)}</span><span class="label">{esc(w)}</span></li>' for i, (t, w) in enumerate(steps))
+    return f'<div class="wrap"><ol class="vflow rv">{items}</ol></div>'
+
+
 def detail(path, crumb_label, crumb_href, x, rel_title, rel_html, og_key, eyebrow, extra_ld):
-    meta = '<div class="art-meta label">' + "".join(f"<span>{esc(t)}</span>" for t in x.get("tags", [])) + "</div>" if x.get("tags") else ""
     crumbs = f'<a href="/">Home</a>{SEP}' + (f'<a href="{crumb_href}">{crumb_label}</a>{SEP}' if crumb_label else "") + f'<span>{esc(x.get("name", x["title"]))}</span>'
-    body = text_hero(crumbs, esc(x["title"]), esc(x["lead"]), meta) + f"""
-<div class="wrap"><figure class="art-fig"><canvas data-dither="{x.get('scene', 'hero')}" data-colors="light" aria-hidden="true"></canvas></figure></div>
+    fig = f'Fig. {x.get("n", "01")} / {esc(eyebrow)}'
+    body = '<main id="main">\n' + detail_hero(crumbs, x, fig) + (flow(x["steps"]) if x.get("steps") else "") + f"""
 <div class="wrap art">
   <aside class="art__aside"><span class="label">On this page</span><ol>{toc_of(x['body'])}</ol>{btn("/#contact", "Request engineers")}</aside>
   <article class="art__body">{x['body']}</article>
@@ -243,7 +263,7 @@ def detail(path, crumb_label, crumb_href, x, rel_title, rel_html, og_key, eyebro
 {CTA}
 </main>"""
     trail = [("Home", "/")] + ([(crumb_label, crumb_href)] if crumb_label else []) + [(x.get("name", x["title"]), path)]
-    return page(path, x["title"], x["desc"], body, og_for(og_key, eyebrow, x.get("name", x["title"])), extra_ld + "\n" + crumbs_ld(trail))
+    return page(path, x["title"], x["desc"], body, og_for(og_key, eyebrow, x.get("name", x["title"])), extra_ld + "\n" + crumbs_ld(trail), solid=False)
 
 
 def service_ld(x, path):
@@ -264,7 +284,7 @@ for i in P.INDUSTRIES:
         path, "Industries", "/#industries", i, "Services", rel_cards([SVC[k] for k in i["services"]], "services", "Service"),
         f"ind-{i['slug']}", "Industries", service_ld({**i, "name": i["title"]}, path)), encoding="utf-8")
 (ROOT / "how-we-vet.html").write_text(detail(
-    "/how-we-vet", "", "", {**P.VETTING, "scene": "map"}, "", "", "how-we-vet", "Process", ""), encoding="utf-8")
+    "/how-we-vet", "", "", P.VETTING, "", "", "how-we-vet", "Process", ""), encoding="utf-8")
 
 # ------------------------------------------------------------------ careers
 role_opts = "".join(f'<option value="{esc(r[0])}">{esc(r[0])}</option>' for r in C.ROLES) + "".join(f'<option value="{esc(j["title"])}">{esc(j["title"])}</option>' for j in C.JOBS)

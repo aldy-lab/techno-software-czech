@@ -77,7 +77,7 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
   // Transparent only at the very top of a page with a hero; solid as soon as
   // anything can scroll underneath it (otherwise the logo sits on top of content).
   const header = $("#header");
-  const hero = $(".hero");
+  const hero = $(".hero, .dhero");
   if (header && hero) {
     let ticking = false;
     const solid = () => { ticking = false; header.classList.toggle("is-solid", scrollY > 8); };
@@ -146,6 +146,24 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
     models.before(bar); models.classList.add("is-tabbed"); select(0);
   }
 
+  /* ---------- "On this page": current section and reading progress ---------- */
+  const toc = $(".art__aside ol"), artBody = $(".art__body");
+  if (toc && artBody) {
+    const links = new Map($$("a", toc).map((a) => [a.getAttribute("href").slice(1), a]));
+    const heads = $$("h2[id]", artBody).filter((h) => links.has(h.id));
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const r = artBody.getBoundingClientRect();
+      toc.style.setProperty("--read", Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight * 0.6))).toFixed(3));
+      let cur = null;
+      for (const h of heads) if (h.getBoundingClientRect().top < innerHeight * 0.35) cur = h.id;
+      links.forEach((a, id) => a.classList.toggle("is-current", id === cur));
+    };
+    addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+
   /* ---------- reveal ---------- */
   const rv = $$(".rv");
   if (!reduce && "IntersectionObserver" in window) {
@@ -165,7 +183,7 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
       if (form.website.value) return;
       const bad = $$("[required]", form).find((f) => !f.value.trim() || (f.type === "email" && !/^\S+@\S+\.\S+$/.test(f.value)));
       if (bad) {
-        status.textContent = T.invalid;
+        status.textContent = T.invalid; form.dataset.state = "invalid";
         bad.focus();
         return;
       }
@@ -178,16 +196,16 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
         const subject = form.dataset.cfg === "form" ? T.request + " — " + (data.get("company") || data.get("name")) : T.application + " — " + (data.get("role") || T.pool) + " — " + data.get("name");
         if (!to) { status.textContent = T.fail; return; }
         location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n") + "\n\n" + data.get("message"))}`;
-        status.textContent = T.opening;
+        status.textContent = T.opening; form.dataset.state = "mail";
       };
       const sent = () => window.plausible && window.plausible(form.dataset.cfg === "form" ? "Enquiry" : "Application");
       if (endpointLive) {
-        status.textContent = T.sending;
+        status.textContent = T.sending; form.dataset.state = "sending";
         try {
           const r = await fetch(CONFIG.FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } });
           if (!r.ok) throw new Error(r.status);
           form.reset();
-          status.textContent = form.dataset.cfg === "form" ? T.thanks : T.thanksApp;
+          status.textContent = form.dataset.cfg === "form" ? T.thanks : T.thanksApp; form.dataset.state = "sent";
           sent();
         } catch {
           // never lose what they typed: hand it to the email app instead

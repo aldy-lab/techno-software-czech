@@ -202,6 +202,177 @@
         return out;
       },
     },
+    /* ---- service pages: one drawing per service ---- */
+    // a block of team modules with one slot open; a new module slides in and docks
+    augment: {
+      colors: "light", animate: true, fps: 12,
+      f(x, y, t, a) {
+        const c = 0.15, ox = a * 0.5 - 3.2 * c, oy = 0.5 - 2 * c;
+        const u = (x - ox) / c, v = (y - oy) / c, gi = Math.floor(u), gj = Math.floor(v), lx = u - gi, ly = v - gj;
+        const box = (px, py) => (px > 0.1 && px < 0.9 && py > 0.1 && py < 0.9 ? (px < 0.17 || px > 0.83 || py < 0.17 || py > 0.83 ? 2 : 1) : 0);
+        let out = 0;
+        if (gi >= 0 && gi < 6 && gj >= 0 && gj < 4) {
+          const b = box(lx, ly);
+          if (gi === 5 && gj === 1) { if (b === 2 && Math.floor((lx + ly) * 10) % 2 === 0) out = 0.55; }
+          else if (b) out = b === 2 ? 0.9 : 0.28;
+        }
+        const s = fract(t * 0.12), k = sstep(0.05, 0.6, s), mx = ox + 5 * c + (1 - k) * (a - ox - 5 * c);
+        const b = box((x - mx) / c, v - 1);
+        if (b) out = b === 2 ? 1 : 0.62;
+        if (Math.abs(v - 1.5) < 0.02 && x > mx + c && k < 1) out = Math.max(out, 0.45);
+        if (!out && Math.abs(fract(x * 22) - 0.5) > 0.46 && Math.abs(fract(y * 22) - 0.5) > 0.46) out = 0.22;
+        return out;
+      },
+    },
+    // a team as a network: a lead node, members around it, work travelling along the links
+    team: {
+      colors: "light", animate: true, fps: 12,
+      prep(w, h, a) {
+        const n = [[0.5, 0.5], [0.24, 0.24], [0.78, 0.22], [0.16, 0.7], [0.84, 0.74], [0.5, 0.12], [0.52, 0.88], [0.32, 0.5], [0.69, 0.48]]
+          .map(([x, y]) => [a * 0.5 + (x - 0.5) * Math.min(a, 1.9) * 0.8, y]);
+        const e = [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [1, 5], [2, 5], [3, 6], [4, 6], [1, 7], [2, 8]];
+        return { n, e };
+      },
+      f(x, y, t, a, k, c) {
+        let out = 0;
+        for (let q = 0; q < c.e.length; q++) {
+          const [p0, p1] = c.e[q], ax = c.n[p0][0], ay = c.n[p0][1], bx = c.n[p1][0], by = c.n[p1][1];
+          const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy, s = clamp(((x - ax) * dx + (y - ay) * dy) / L);
+          const d = Math.hypot(x - ax - s * dx, y - ay - s * dy);
+          if (d < 0.005) out = Math.max(out, 0.4);
+          if (d < 0.016 && Math.abs(s - fract(t * 0.25 + q * 0.37)) < 0.04) out = 1;
+        }
+        for (let q = 0; q < c.n.length; q++) {
+          const r = Math.hypot(x - c.n[q][0], y - c.n[q][1]), R = q === 0 ? 0.075 : 0.045;
+          if (r < R) out = r > R - 0.014 ? 1 : q === 0 ? 0.6 : 0.25;
+        }
+        return out;
+      },
+    },
+    // a browser window and a phone, with content blocks loading in
+    web: {
+      colors: "light", animate: true, fps: 10,
+      f(x, y, t, a) {
+        const frame = (x0, y0, w, h, lx, ly) => x >= x0 && x <= x0 + w && y >= y0 && y <= y0 + h && (x - x0 < lx || x0 + w - x < lx || y - y0 < ly || y0 + h - y < ly);
+        const bx = a * 0.5 - 0.62, by = 0.14, bw = 1.0, bh = 0.72;
+        const px = bx + bw - 0.12, py = 0.3, pw = 0.3, ph = 0.6;
+        let out = 0;
+        if (x > px && x < px + pw && y > py && y < py + ph) {
+          if (frame(px, py, pw, ph, 0.012, 0.012)) return 1;
+          if (y > py + ph - 0.07 && Math.abs(x - px - pw / 2) < 0.03) return 0.9;
+          const row = Math.floor((y - py - 0.06) / 0.07), lxp = (x - px - 0.04) / (pw - 0.08);
+          if (row >= 0 && row < 6 && fract((y - py - 0.06) / 0.07) < 0.55 && lxp > 0 && lxp < (row % 2 ? 0.6 : 1)) return row === 0 ? 0.75 : 0.3;
+          return 0;
+        }
+        if (frame(bx, by, bw, bh, 0.01, 0.01)) out = 1;
+        else if (x > bx && x < bx + bw && y > by && y < by + 0.08) {
+          out = 0.3;
+          for (let d = 0; d < 3; d++) if (Math.hypot(x - bx - 0.05 - d * 0.04, y - by - 0.04) < 0.013) out = 0.95;
+        } else if (x > bx && x < bx + bw && y > by && y < by + bh) {
+          const lx = (x - bx) / bw, ly = (y - by - 0.08) / (bh - 0.08), cols = lx < 0.3 ? 0 : 1;
+          const fill = sstep(0, 1, fract(t * 0.1) * 1.6 - ly * 0.6);
+          if (cols === 0 && lx > 0.05 && lx < 0.26 && fract(ly * 8) < 0.5) out = 0.25;
+          if (cols === 1 && lx > 0.34 && lx < 0.95 && ly > 0.08 && ly < 0.45) out = 0.12 + 0.45 * fill;
+          if (cols === 1 && lx > 0.34 && ly > 0.55 && fract(ly * 9) < 0.45 && lx < 0.95 - 0.2 * hash(Math.floor(ly * 9), 4)) out = 0.3;
+        }
+        return out;
+      },
+    },
+    // a microcontroller with traces fanning out to vias; signals run along them
+    embedded: {
+      colors: "light", animate: true, fps: 12,
+      f(x, y, t, a) {
+        const cx = a * 0.5, cy = 0.5, dx = x - cx, dy = y - cy, ax = Math.abs(dx), ay = Math.abs(dy), S = 0.17;
+        if (ax < S && ay < S) {
+          if (ax > S - 0.014 || ay > S - 0.014) return 1;
+          if (Math.hypot(dx + S * 0.6, dy + S * 0.6) < 0.025) return 0.9;
+          return Math.abs(fract(dx * 30) - 0.5) > 0.45 || Math.abs(fract(dy * 30) - 0.5) > 0.45 ? 0.35 : 0.15;
+        }
+        // four sides of pins, each continuing as a straight trace that ends in a via
+        const side = ax > ay ? (dx > 0 ? 0 : 1) : dy > 0 ? 2 : 3;
+        const along = side < 2 ? dy : dx, across = side < 2 ? ax : ay;
+        const pins = 6, pitch = (2 * S) / (pins + 1), pi = Math.round(along / pitch + 0.5) - 0.5;
+        let out = 0;
+        if (Math.abs(pi) < pins / 2) {
+          const off = along - pi * pitch, len = S + 0.1 + hash(side, pi * 2) * 0.32;
+          if (across < S + 0.035 && Math.abs(off) < 0.014) out = 0.95;
+          else if (across < len && Math.abs(off) < 0.005) {
+            out = 0.5;
+            if (Math.abs(S + fract(t * 0.3 + hash(pi * 2, side)) * (len - S) - across) < 0.022) out = 1;
+          }
+          const vr = Math.hypot(across - len - 0.014, off);
+          if (vr < 0.02) out = vr > 0.009 ? 0.95 : 0;
+        }
+        if (!out && Math.abs(fract(x * 18) - 0.5) > 0.46 && Math.abs(fract(y * 18) - 0.5) > 0.46) out = 0.2;
+        return out;
+      },
+    },
+    // a test run: rows of cases, a scan line moving down, passes marked as it goes
+    qa: {
+      colors: "light", animate: true, fps: 12,
+      f(x, y, t, a) {
+        const x0 = a * 0.5 - 0.7, x1 = a * 0.5 + 0.7, rows = 9, top = 0.1, rh = 0.8 / rows;
+        if (x < x0 || x > x1 || y < top || y > top + rows * rh) return Math.abs(fract(x * 20) - 0.5) > 0.46 && Math.abs(fract(y * 20) - 0.5) > 0.46 ? 0.2 : 0;
+        const r = Math.floor((y - top) / rh), ly = fract((y - top) / rh), scan = fract(t * 0.12) * rows;
+        if (Math.abs((y - top) / rh - scan) < 0.05) return 1;
+        if (ly < 0.2 || ly > 0.8) return 0;
+        const done = r < scan, bx = x - x0, len = 0.55 + 0.6 * hash(r, 7);
+        if (bx < 0.1) {
+          if (bx > 0.02 && bx < 0.08) {
+            if (!done) return bx < 0.03 || bx > 0.07 || ly < 0.3 || ly > 0.7 ? 0.5 : 0;
+            return 0.95;
+          }
+          return 0;
+        }
+        if (bx > 0.16 && bx < 0.16 + len) return done ? 0.42 : 0.18;
+        if (bx > x1 - x0 - 0.18 && bx < x1 - x0 - 0.02 && done) return 0.7;
+        return 0;
+      },
+    },
+    // the delivery loop: build → test → deploy → observe, as a figure of eight with work moving round it
+    devops: {
+      colors: "light", animate: true, fps: 12,
+      f(x, y, t, a) {
+        const R = 0.27, c1 = a * 0.5 - R, c2 = a * 0.5 + R, cy = 0.5;
+        const d1 = Math.hypot(x - c1, y - cy), d2 = Math.hypot(x - c2, y - cy);
+        let out = 0;
+        const ring = (d, cx, dir) => {
+          if (Math.abs(d - R) < 0.03) {
+            const th = Math.atan2(y - cy, x - cx) / TAU;
+            const flow = fract(th * 10 * dir - t * 0.6);
+            return Math.abs(d - R) < 0.008 ? 1 : flow < 0.35 ? 0.6 : 0.2;
+          }
+          return 0;
+        };
+        out = Math.max(ring(d1, c1, 1), ring(d2, c2, -1));
+        for (let q = 0; q < 4; q++) {
+          const cx = q < 2 ? c1 : c2, th = (q % 2 ? 0.5 : -0.5) * Math.PI;
+          const r = Math.hypot(x - cx - R * Math.cos(th) * (q < 2 ? -1 : 1) * 0, y - cy - R * Math.sin(th));
+          if (Math.abs(x - cx) < 0.03 && r < 0.035) out = r > 0.02 ? 1 : 0.3;
+        }
+        if (!out && Math.abs(fract(x * 20) - 0.5) > 0.46 && Math.abs(fract(y * 20) - 0.5) > 0.46) out = 0.2;
+        return out;
+      },
+    },
+    // vetting: a field of candidates, a lens passing over it, the few that pass outlined
+    vet: {
+      colors: "light", animate: true, fps: 12,
+      f(x, y, t, a) {
+        const c = 0.075, gi = Math.floor(x / c), gj = Math.floor(y / c), lx = fract(x / c), ly = fract(y / c);
+        const lxC = a * (0.5 + 0.32 * Math.sin(t * 0.22)), lyC = 0.5 + 0.18 * Math.sin(t * 0.31 + 1);
+        const r = Math.hypot(x - lxC, y - lyC), R = 0.24;
+        const picked = hash(gi, gj) > 0.9;
+        let out = 0;
+        const inCell = lx > 0.25 && lx < 0.75 && ly > 0.25 && ly < 0.75;
+        if (r < R) {
+          const big = lx > 0.12 && lx < 0.88 && ly > 0.12 && ly < 0.88;
+          if (big) out = picked ? (lx < 0.2 || lx > 0.8 || ly < 0.2 || ly > 0.8 ? 1 : 0.6) : 0.18;
+          if (Math.abs(r - R) < 0.012) out = 1;
+        } else if (inCell) out = picked ? 0.55 : 0.22;
+        if (r > R && r < R + 0.2 && Math.abs((x - lxC) - (y - lyC)) < 0.012 && x > lxC && y > lyC) out = 0.9;
+        return out;
+      },
+    },
     waves: {
       colors: "waves", animate: true, fps: 15,
       // the line offset depends only on column and line index: compute it once per frame
