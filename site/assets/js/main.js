@@ -85,6 +85,18 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
     );
   });
 
+  /* ---------- phones: floating call to action, between the hero and the contact form ---------- */
+  const mcta = $(".mcta");
+  if (mcta && hero) {
+    const seen = { hero: true, end: false };
+    const set = () => mcta.classList.toggle("is-on", !seen.hero && !seen.end);
+    new IntersectionObserver(([e]) => { seen.hero = e.isIntersecting; set(); }).observe(hero);
+    const ends = $$("#contact, .footer");
+    const vis = new Set();
+    const io = new IntersectionObserver((es) => { es.forEach((e) => (e.isIntersecting ? vis.add(e.target) : vis.delete(e.target))); seen.end = vis.size > 0; set(); });
+    ends.forEach((el) => io.observe(el));
+  }
+
   /* ---------- engagement models: tabs on phones (CSS shows the bar only there) ---------- */
   const models = $(".models");
   if (models) {

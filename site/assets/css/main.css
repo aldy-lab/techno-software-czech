@@ -876,3 +876,65 @@ body.menu-open { overflow: hidden; }
   .phero { min-height: 0; }
   .apply__info { gap: 16px; margin-bottom: 28px; }
 }
+
+/* ======================= phones: beauty pass (keep last) ======================= */
+.mcta { display: none; }
+@media (max-width: 860px) {
+  /* header: lighter menu control */
+  .menu-btn { border: 0; padding: 0 0 0 10px; gap: 6px; }
+  .menu-btn__bars { width: 32px; }
+
+  /* first screen: one composed poster — headline, offer, partner line, facts strip */
+  .hero { min-height: 100svh; }
+  .hero__body { padding-top: calc(var(--header-h) + 28px); padding-bottom: 22px; align-content: end; }
+  .hero__eyebrow { font-size: .66rem; margin-bottom: 16px; }
+  .hero__title { font-size: clamp(3rem, 14.2vw, 4.4rem); line-height: .9; letter-spacing: -.05em; }
+  .hero__side { margin-top: 22px; gap: 16px; }
+  .hero__side p { font-size: 1.02rem; line-height: 1.45; color: rgba(255,255,255,.86); }
+  .hero__ctas .btn { min-height: 54px; }
+  .partner-badge { padding: 0; background: none; border: 0; gap: 12px; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .partner-badge img { width: 64px; }
+  .partner-badge__txt { padding-left: 12px; gap: 2px; }
+  .partner-badge__txt .label { font-size: .6rem; }
+  .partner-badge__txt span:last-child { font-size: .8rem; }
+  .hero__facts ul { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .hero__facts li, .hero__facts li:nth-child(3), .hero__facts li:nth-child(n+3) { padding: 12px 8px 14px; border-top: 0; border-left: 1px solid var(--rule-on-accent); gap: 2px; }
+  .hero__facts li:first-child { border-left: 0; padding-left: 0; }
+  .hero__facts b { font-size: 1.02rem; letter-spacing: -.01em; white-space: nowrap; }
+  .hero__facts span { font-size: .58rem; letter-spacing: .04em; line-height: 1.3; }
+  .phero .hero__facts { display: none; }
+
+  /* section index, like the numbering on a drawing set */
+  main { counter-reset: sec; }
+  main > section.section { counter-increment: sec; padding-top: 72px; }
+  main > section.section::before {
+    content: counter(sec, decimal-leading-zero); position: absolute; top: 26px; left: var(--gutter); right: var(--gutter);
+    padding-top: 10px; border-top: 1px solid var(--rule);
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .14em; color: var(--cobalt-500);
+  }
+  .section--blue::before, .section--deep::before { border-top-color: var(--rule-on-accent) !important; color: var(--cobalt-300); }
+  .section--alt + .section--alt::before, .section::before { z-index: 1; }
+
+  /* headings: one weight of drama, consistent */
+  .split__h, .ind-head h2, .sec-head h2 { font-size: clamp(2.3rem, 10.4vw, 2.9rem); letter-spacing: -.045em; line-height: .95; }
+
+  /* comparison: easier to read */
+  .cmp__head > * { font-size: .58rem; line-height: 1.3; }
+  .cmp__row > :first-child { font-weight: 480; }
+
+  /* floating call to action */
+  .mcta { display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 40;
+    justify-content: space-between; box-shadow: 0 18px 40px -16px rgba(5, 12, 61, .55);
+    transform: translateY(140%); transition: transform .45s var(--ease-out); }
+  .mcta.is-on { transform: none; }
+  body.menu-open .mcta, body.tg-open .mcta { transform: translateY(140%); }
+  .footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) { .mcta { transition: none; } }
+@media (max-width: 360px) { .hero__facts b { font-size: .92rem; } .hero__facts span { font-size: .54rem; } }
+@media (max-width: 360px) {
+  .logo__name { white-space: nowrap; font-size: 1.02rem; }
+  .logo__mark { width: 30px; height: 30px; }
+  .logo { gap: 10px; }
+  .menu-btn { font-size: .66rem; }
+}
