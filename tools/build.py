@@ -59,7 +59,15 @@ def og_for(key, eyebrow, title):
     return f"{SITE}/assets/img/og/{key}.png"
 
 
-def finish(page):
+# English path → its Czech page (tools/i18n.py writes those); other pages offer the Czech home
+CS_PAGES = {"/": "/cs/", "/careers": "/cs/careers", "/privacy": "/cs/privacy"}
+
+
+def finish(page, path="/"):
+    cs = CS_PAGES.get(path)
+    page = page.replace("{{LANG}}", f'<a class="lang" href="{cs or "/cs/"}" hreflang="cs" lang="cs"><span class="vh">Česky — </span>CS</a>')
+    if cs:
+        page = page.replace("</head>", f'<link rel="alternate" hreflang="en" href="{SITE}{path}">\n<link rel="alternate" hreflang="cs" href="{SITE}{cs}">\n<link rel="alternate" hreflang="x-default" href="{SITE}{path}">\n</head>', 1)
     page = page.replace("{{SITE}}", SITE)
     page = page.replace('href="/assets/css/main.css"', f'href="/assets/css/main.css?v={VER}"')
     page = page.replace('src="/assets/js/main.js"', f'src="/assets/js/main.js?v={VER}"')
@@ -97,7 +105,7 @@ def page(path, title, desc, body, og, extra_head="", solid=True):
 <a class="skip" href="#main">Skip to content</a>
 """
     tail = "\n".join([block("FOOTER"), block("SPRITE"), '<script src="/assets/js/main.js" defer></script>\n</body>\n</html>\n'])
-    return finish(head + block("HEADER") + "\n" + body + "\n" + tail)
+    return finish(head + block("HEADER") + "\n" + body + "\n" + tail, path)
 
 
 def arrow(href, text):
@@ -160,7 +168,7 @@ CTA = f"""<section class="cta-band"><canvas data-dither="waves" aria-hidden="tru
 
 idx_body = text_hero(f'<a href="/">Home</a>{SEP}<span>Insights</span>', "Insights",
                      "Practical notes for engineering leaders on building teams, contracting in the Czech Republic and working in regulated industries.") + f"""
-<section class="section"><div class="wrap">{post_cards(C.POSTS)}</div></section>
+<section class="section"><div class="wrap"><h2 class="vh">All articles</h2>{post_cards(C.POSTS)}</div></section>
 {CTA}
 </main>"""
 (ROOT / "insights.html").write_text(page("/insights", "Insights", "Practical notes for engineering leaders on team augmentation, contracting in Czechia and regulated industries.",
@@ -355,7 +363,7 @@ NOTFOUND = f"""<main id="main" class="doc"><div class="wrap">
 (ROOT / "404.html").write_text(page("/404", "Page not found", "Page not found.", NOTFOUND, f"{SITE}/assets/img/og.png"), encoding="utf-8")
 
 # ------------------------------------------------------------------ sitemap, robots, og list
-urls = ["/", "/careers", "/insights"] + [f"/insights/{p['slug']}" for p in C.POSTS] + [f"/careers/{j['slug']}" for j in C.JOBS] + ["/privacy"]
+urls = ["/", "/careers", "/insights"] + [f"/insights/{p['slug']}" for p in C.POSTS] + [f"/careers/{j['slug']}" for j in C.JOBS] + ["/privacy"] + list(CS_PAGES.values())
 (ROOT / "sitemap.xml").write_text(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + "".join(f"  <url><loc>{SITE}{u}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")

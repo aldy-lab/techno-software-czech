@@ -13,6 +13,19 @@ const CONFIG = {
 // where each form's mail goes when there is no endpoint
 const FORM_MAIL = { form: () => CONFIG.EMAIL, "careers-form": () => CONFIG.CAREERS_EMAIL || CONFIG.EMAIL };
 
+// interface wording; the page's lang picks the set (Czech pages live under /cs/)
+const T = document.documentElement.lang === "cs" ? {
+  tabs: "Modely spolupráce", invalid: "Vyplňte prosím jméno, platný e-mail a krátkou zprávu.", sending: "Odesíláme…",
+  thanks: "Děkujeme — ozveme se do jednoho pracovního dne.", thanksApp: "Děkujeme — vaše přihláška dorazila.",
+  failTo: (to) => `Odeslání se nezdařilo. Napište nám prosím na ${to}.`, fail: "Odeslání se nezdařilo. Zkuste to prosím znovu.",
+  request: "Poptávka týmu", application: "Přihláška", pool: "talent pool", opening: "Otevíráme váš e-mailový program…",
+} : {
+  tabs: "Engagement models", invalid: "Please fill in your name, a valid email and a short message.", sending: "Sending…",
+  thanks: "Thank you — we will be in touch within one business day.", thanksApp: "Thank you — your application has arrived.",
+  failTo: (to) => `Sending failed. Please email ${to}.`, fail: "Sending failed. Please try again.",
+  request: "Team request", application: "Application", pool: "talent pool", opening: "Opening your email app…",
+};
+
 const V = (document.currentScript && new URL(document.currentScript.src).search) || "";
 
 (() => {
@@ -102,7 +115,7 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
   if (models) {
     const items = $$(".model", models);
     const bar = document.createElement("div");
-    bar.className = "models__tabs"; bar.setAttribute("role", "tablist"); bar.setAttribute("aria-label", "Engagement models");
+    bar.className = "models__tabs"; bar.setAttribute("role", "tablist"); bar.setAttribute("aria-label", T.tabs);
     items.forEach((m, i) => {
       const id = `model-${i + 1}`;
       m.id = id; m.setAttribute("role", "tabpanel");
@@ -138,28 +151,28 @@ const V = (document.currentScript && new URL(document.currentScript.src).search)
       if (form.website.value) return;
       const bad = $$("[required]", form).find((f) => !f.value.trim() || (f.type === "email" && !/^\S+@\S+\.\S+$/.test(f.value)));
       if (bad) {
-        status.textContent = "Please fill in your name, a valid email and a short message.";
+        status.textContent = T.invalid;
         bad.focus();
         return;
       }
       const data = new FormData(form);
       data.set("form", form.dataset.cfg);
       if (CONFIG.FORM_ENDPOINT) {
-        status.textContent = "Sending…";
+        status.textContent = T.sending;
         try {
           const r = await fetch(CONFIG.FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } });
           if (!r.ok) throw new Error(r.status);
           form.reset();
-          status.textContent = form.dataset.cfg === "form" ? "Thank you — we will be in touch within one business day." : "Thank you — your application has arrived.";
+          status.textContent = form.dataset.cfg === "form" ? T.thanks : T.thanksApp;
         } catch {
-          status.textContent = to ? `Sending failed. Please email ${to}.` : "Sending failed. Please try again.";
+          status.textContent = to ? T.failTo(to) : T.fail;
         }
       } else {
         const lines = [];
         for (const [k, v] of data) if (v && !["website", "form", "message"].includes(k) && typeof v === "string") lines.push(`${k}: ${v}`);
-        const subject = form.dataset.cfg === "form" ? "Team request — " + (data.get("company") || data.get("name")) : "Application — " + (data.get("role") || "talent pool") + " — " + data.get("name");
+        const subject = form.dataset.cfg === "form" ? T.request + " — " + (data.get("company") || data.get("name")) : T.application + " — " + (data.get("role") || T.pool) + " — " + data.get("name");
         location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n") + "\n\n" + data.get("message"))}`;
-        status.textContent = "Opening your email app…";
+        status.textContent = T.opening;
       }
     });
   });
