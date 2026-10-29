@@ -15,7 +15,11 @@ technical team augmentation, a spin-off of Damas Engineering. English at `/`, Cz
 - `tools/og.py` — renders a 1200×630 share card per page into `site/assets/img/og/`
 - `site/assets/js/main.js` — go-live CONFIG block at the top; every image on the site
   is a generated Bayer-dither drawing (no stock photos to license).
-- `site/` is what Vercel serves (Root Directory = `site`).
+- `site/` is what Vercel serves. **Warning:** the Vercel project is linked to this GitHub repo but its
+  Root Directory is NOT set, so every push to `main` makes a production deploy of the repo root —
+  an empty site that answers 404 everywhere. Until someone sets Vercel → Project → Settings →
+  Build and Deployment → Root Directory = `site`, always deploy from `site/` with the CLI **after**
+  pushing: `cd site && npx vercel deploy --prod`. (Once it is set, deploy from the repo root instead.)
 
 ```
 python3 tools/build.py && python3 tools/i18n.py && python3 tools/og.py
