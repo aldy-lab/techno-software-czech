@@ -31,7 +31,7 @@ The end screen links to the contact form. `assets/js/game.js` loads only on firs
 |---|---|
 | Email, phone, LinkedIn → `CONFIG` in main.js | Links are removed; the contact form is hidden and a location map shows instead |
 | Form endpoint (or at least an email) | No way to send an enquiry from the site |
-| Domain | `SITE` points at the vercel.app URL; `INDEXABLE = False` (noindex + robots Disallow) |
+| Domain | **Done:** technosoftware.cz (GoDaddy DNS → Vercel A/CNAME records), www → 308 to the bare domain, indexing on |
 | Written OK from Damas Engineering to use their logo and the "partner" wording | Logo and figures (1,200+ experts, 7 countries, 2012, ISO 9001) are Damas's own published claims, attributed as such |
 | Confirm service promises | "shortlist within a week", "2–4 weeks to onboard", "replacement guarantee", "reply within one business day", team sizes, EN/CZ/IT languages, EUR/CZK billing — written as reasonable defaults, not supplied by the client |
 | Careers email or form endpoint (`CAREERS_EMAIL` / `FORM_ENDPOINT`) | Application form hidden; careers page shows the postal address instead. CV upload appears only with an endpoint |

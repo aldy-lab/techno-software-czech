@@ -11,8 +11,8 @@ from datetime import date
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import content as C  # noqa: E402
 
-SITE = "https://techno-software-czech.vercel.app"
-INDEXABLE = False  # flip to True when the real domain is connected
+SITE = "https://technosoftware.cz"
+INDEXABLE = True   # technosoftware.cz connected 29 Oct 2026
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 ROOT = TOOLS.parent / "site"
