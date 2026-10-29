@@ -269,7 +269,8 @@ body.menu-open { overflow: hidden; }
 .partner-badge__txt span:last-child { font-size: .88rem; line-height: 1.35; color: var(--on-accent-muted); }
 @media (hover: hover) { .partner-badge:hover { background: rgba(5, 12, 61, .55); border-color: rgba(255,255,255,.5); } }
 
-.hero__facts { border-top: 1px solid var(--rule-on-accent); position: relative; }
+/* a solid band: the pattern stops at its top rule, so the facts never sit on moving stripes */
+.hero__facts { border-top: 1px solid var(--rule-on-accent); position: relative; z-index: 1; background: var(--cobalt-700); }
 .hero__facts ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .hero__facts li { padding: 18px 20px 22px; border-left: 1px solid var(--rule-on-accent); display: grid; gap: 4px; }
 .hero__facts li:first-child { border-left: 0; padding-left: 0; }
