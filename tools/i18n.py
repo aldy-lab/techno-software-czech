@@ -186,8 +186,8 @@ def localise(page, en_path):
     page = page.replace('<link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>',
                         '<link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>\n<link rel="preload" href="/assets/fonts/geist-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin>', 1)
     # links to pages that exist in Czech go to the Czech page
-    page = re.sub(r'href="/(careers|privacy)?([#?][^"]*)?"', lambda m: f'href="/cs/{m.group(1) or ""}{m.group(2) or ""}"', page)
-    page = re.sub(r'<link rel="canonical" href="([^"]*)">', lambda m: f'<link rel="canonical" href="{m.group(1).rstrip("/").replace("technosoftware.cz", "technosoftware.cz/cs", 1)}{"/" if en_path == "/" else ""}">', page)
+    page = re.sub(r'href="/(careers|privacy)?([#?][^"]*)?"', lambda m: f'href="/cs{"/" + m.group(1) if m.group(1) else ""}{m.group(2) or ""}"', page)
+    page = re.sub(r'<link rel="canonical" href="https://technosoftware.cz/?([^"]*)">', lambda m: f'<link rel="canonical" href="https://technosoftware.cz/cs{"/" + m.group(1) if m.group(1) else ""}">', page)
     page = re.sub(r'<a class="lang" href="[^"]*" hreflang="cs" lang="cs"><span class="vh">[^<]*</span>CS</a>',
                   f'<a class="lang" href="{en_path}" hreflang="en" lang="en"><span class="vh">English — </span>EN</a>', page)
     return page

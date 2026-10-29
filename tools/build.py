@@ -60,12 +60,12 @@ def og_for(key, eyebrow, title):
 
 
 # English path → its Czech page (tools/i18n.py writes those); other pages offer the Czech home
-CS_PAGES = {"/": "/cs/", "/careers": "/cs/careers", "/privacy": "/cs/privacy"}
+CS_PAGES = {"/": "/cs", "/careers": "/cs/careers", "/privacy": "/cs/privacy"}
 
 
 def finish(page, path="/"):
     cs = CS_PAGES.get(path)
-    page = page.replace("{{LANG}}", f'<a class="lang" href="{cs or "/cs/"}" hreflang="cs" lang="cs"><span class="vh">Česky — </span>CS</a>')
+    page = page.replace("{{LANG}}", f'<a class="lang" href="{cs or "/cs"}" hreflang="cs" lang="cs"><span class="vh">Česky — </span>CS</a>')
     if cs:
         page = page.replace("</head>", f'<link rel="alternate" hreflang="en" href="{SITE}{path}">\n<link rel="alternate" hreflang="cs" href="{SITE}{cs}">\n<link rel="alternate" hreflang="x-default" href="{SITE}{path}">\n</head>', 1)
     page = page.replace("{{SITE}}", SITE)
