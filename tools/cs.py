@@ -42,7 +42,7 @@ CS = {
 "Senior engineers who join your squad, ship in your stack and work in your time zone. From one specialist to a full delivery team.":
     "Seniorní inženýři, kteří se zapojí do vašeho týmu, pracují ve vašem stacku a ve vašem časovém pásmu. Od jednoho specialisty po celý dodávkový tým.",
 'Request engineers <span class="btn__icon"><svg/></span>': 'Poptat inženýry <span class="btn__icon"><svg/></span>',
-"Spin-off of": "Spin-off společnosti",
+'Spin-off <span class="lc">of</span>': 'Spin-off <span class="lc">společnosti</span>',
 "Damas Engineering — 500 experts, 5 countries.": "Damas Engineering — 500 odborníků, 5 zemí.",
 "Engineering teams,<br><em>extended.</em>": "Inženýrské týmy,<br><em>rozšířené.</em>",
 "Prague 1": "Praha 1",
